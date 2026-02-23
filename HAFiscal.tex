@@ -50,8 +50,8 @@
   \tableofcontents
 }{}
 
-% make the body of the paper
-\input{Subfiles.ltx} % all sections are subfiles enumerated here 
+% make the body of the paper (trimmed scaffold)
+\input{Subfiles-minimal.ltx}
 
 \pagebreak
 
@@ -90,46 +90,7 @@
 \markboth{APPENDICES}{APPENDICES}
 
 \appendix
-% Include appendices based on their type and OnlineAppendixHandling
-
-% A: HANK appendix (always include full content) - moved from B to A
-\subfile{Subfiles/Appendix-HANK}
-
-% B: No Splurge appendix - now online only with stub page
-% Add pagebreak so Appendix B can be easily removed by dropping last page(s)
-\clearpage
-\FloatBarrier
-\phantomsection
-\section{\href{https://econ-ark.github.io/HAFiscal/\#app:Model-without-splurge}{Results in a Model Without the Splurge}}
-\label{app:Model-without-splurge}
-
-\noindent\textit{Full appendix PDF available at:}
-\href{https://github.com/econ-ark/HAFiscal/blob/master/Subfiles/Appendix-NoSplurge.pdf}{\texttt{GitHub: Subfiles/Appendix-NoSplurge.pdf}}
-
-\medskip
-\noindent\textit{Click any section title below to view it online in HTML:}
-
-\medskip
-
-\subsection{\href{https://econ-ark.github.io/HAFiscal/\#app:Model-without-splurge-intro}{Introduction}}
-\label{app:Model-without-splurge-intro}
-
-\subsection{\href{https://econ-ark.github.io/HAFiscal/\#app:nosplurge-matching-impcs}{Matching the iMPCs without the splurge}}
-\label{app:nosplurge-matching-impcs}
-
-\subsection{\href{https://econ-ark.github.io/HAFiscal/\#app:nosplurge-estimating-betas}{Estimating discount factor distributions without the splurge}}
-\label{app:nosplurge-estimating-betas}
-
-\subsection{\href{https://econ-ark.github.io/HAFiscal/\#app:nosplurge-multipliers}{Multipliers in the absence of the splurge}}
-\label{app:nosplurge-multipliers}
-
-\medskip
-
-% C: Robustness appendix (using hidden appendix approach)
-% This appendix is processed for labels but doesn't appear in the PDF
-\begin{hiddencontent}[OnlineAppendix]
-  % Include the actual appendix content but it will be hidden
-  \subfile{Subfiles/Appendix-Robustness}
-\end{hiddencontent}
+\section{Appendix: Minimal retained content}
+This stripped version keeps one appendix section while removing most appendix material.
 
 \end{document}
