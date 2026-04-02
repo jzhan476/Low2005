@@ -1,0 +1,40 @@
+# =============================================================================
+# REMARK/Binder-compatible conda environment for Low2005
+# =============================================================================
+#
+# This file exists at binder/environment.yml to match the REMARK/Binder
+# conventions used by the repository and its reproduction tooling.
+#
+# Create environment:
+#   conda env create -f binder/environment.yml
+# Activate:
+#   conda activate low2005
+# =============================================================================
+
+name: low2005
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.9
+  - numpy>=1.24,<2
+  - scipy>=1.10
+  - pandas>=2.0
+  - matplotlib>=3.7
+  - numba>=0.57
+  - jupyter>=1.0
+  - notebook>=7.0
+  - ipykernel>=6.0
+  - voila>=0.5.6
+  - statsmodels>=0.14
+  - seaborn>=0.12
+  - black>=23.0
+  - pytest>=7.0
+  - pytest-cov>=4.0
+  - mypy>=1.0
+  - ruff>=0.1.0
+  - pip
+  - pip:
+      - econ-ark==0.14.1
+      - ipynb-py-convert>=0.4

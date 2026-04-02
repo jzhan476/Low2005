@@ -593,7 +593,7 @@ class ReproductionScript:
                 print()
                 print("Please set up an environment:")
                 print("  Option 1 (Recommended): ./reproduce/reproduce_environment_comp_uv.sh")
-                print("  Option 2 (Traditional):  conda env create -f environment.yml")
+                print("  Option 2 (Traditional):  conda env create -f binder/environment.yml")
                 overall_status = 1
                 print()
         

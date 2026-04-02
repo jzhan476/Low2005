@@ -1265,7 +1265,7 @@ test_environment_comprehensive() {
             echo ""
             echo "Please set up an environment:"
             echo "  Option 1 (Recommended): ./reproduce/reproduce_environment_comp_uv.sh"
-            echo "  Option 2 (Traditional):  conda env create -f environment.yml  # env name: low2005"
+            echo "  Option 2 (Traditional):  conda env create -f binder/environment.yml  # env name: low2005"
             overall_status=1
         fi
         echo ""
@@ -1441,7 +1441,7 @@ test_environment() {
     else
         echo "  ⚠️  No environment detected. Run one of:"
         echo "     ./reproduce/reproduce_environment_comp_uv.sh  (recommended, fast)"
-        echo "     conda env create -f environment.yml      (traditional; env name: low2005)"
+        echo "     conda env create -f binder/environment.yml  (traditional; env name: low2005)"
     fi
     
     # Report results

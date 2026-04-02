@@ -1,18 +1,21 @@
 # =============================================================================
 # NOTICE: UV is now the recommended environment manager for this project
 # =============================================================================
-# 
+#
 # For faster setup (recommended):
 #   uv sync --all-groups
 #   source .venv/bin/activate
 #
-# This conda environment.yml is maintained for backward compatibility.
-# See README.md for migration instructions.
+# The canonical REMARK/Binder-compatible conda environment now lives at:
+#   binder/environment.yml
+#
+# This root copy is kept for backward compatibility with older local workflows.
+# See README.md for the preferred setup instructions.
 # =============================================================================
 
 # Conda environment for Low2005 (optional; UV is preferred)
-# Create environment: conda env create -f environment.yml
-# Update environment: conda env update -f environment.yml --prune
+# Create environment: conda env create -f binder/environment.yml
+# Update environment: conda env update -f binder/environment.yml --prune
 # Activate: conda activate low2005
 
 name: low2005

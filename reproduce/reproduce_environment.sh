@@ -1,7 +1,8 @@
 #!/bin/bash
 # Low2005 environment setup wrapper
 # This script delegates to reproduce_environment_comp_uv.sh (SST for UV setup)
-# and only falls back to conda if UV setup fails or is unavailable
+# and only falls back to conda if UV setup fails or is unavailable.
+# The preferred conda path is binder/environment.yml for REMARK/Binder alignment.
 
 set -e
 
@@ -44,7 +45,17 @@ echo "     curl -LsSf https://astral.sh/uv/install.sh | sh"
 echo ""
 
 ENV_NAME="low2005"
-ENV_FILE="$PROJECT_ROOT/binder/environment.yml"
+BINDER_ENV_FILE="$PROJECT_ROOT/binder/environment.yml"
+LEGACY_ENV_FILE="$PROJECT_ROOT/environment.yml"
+ENV_FILE="$BINDER_ENV_FILE"
+
+# Backward-compatible fallback for older local setups.
+if [[ ! -f "$ENV_FILE" && -f "$LEGACY_ENV_FILE" ]]; then
+    echo "⚠️  binder/environment.yml not found"
+    echo "   Falling back to legacy root environment.yml"
+    echo ""
+    ENV_FILE="$LEGACY_ENV_FILE"
+fi
 
 # Check if conda is available
 if ! command -v conda >/dev/null 2>&1; then

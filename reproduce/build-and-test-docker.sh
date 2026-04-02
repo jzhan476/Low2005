@@ -299,7 +299,7 @@ else
     echo ""
     echo "Debugging suggestions:"
     echo "  1. Check LaTeX installation in Dockerfile: RUN apt-get install texlive-full"
-    echo "  2. Verify all dependencies are installed: check environment.yml and pyproject.toml"
+    echo "  2. Verify all dependencies are installed: check binder/environment.yml and pyproject.toml"
     echo "  3. Run interactively to debug: docker run -it $DOCKER_IMAGE bash"
     echo "  4. Check reproduce logs in container: docker exec $DOCKER_CONTAINER cat /workspace/reproduce/logs/latest.log"
     echo ""
