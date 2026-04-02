@@ -1,5 +1,5 @@
 #!/bin/bash
-# HAFiscal Environment Setup with UV
+# Low2005 environment setup with UV
 # This script sets up the Python environment using UV package manager
 # This is the SINGLE SOURCE OF TRUTH for UV environment setup
 
@@ -220,7 +220,7 @@ VENV_PATH=$(get_platform_venv_path)
 VENV_NAME=$(basename "$VENV_PATH")
 
 echo "========================================"
-echo "HAFiscal Environment Setup (UV)"
+echo "Low2005 Environment Setup (UV)"
 echo "========================================"
 echo ""
 echo "Platform: $(uname -s) ($(uname -m))"
@@ -271,8 +271,8 @@ if [[ -d "$VENV_PATH" ]] && [[ -f "$VENV_PATH/bin/python" ]]; then
             echo "✅ UV environment activated"
             
             # Export environment variables for use in subscripts (PLAN A)
-            export HAFISCAL_PYTHON="$VENV_PATH/bin/python"
-            export HAFISCAL_PYTHON3="$VENV_PATH/bin/python3"
+            export LOW2005_PYTHON="$VENV_PATH/bin/python"
+            export LOW2005_PYTHON3="$VENV_PATH/bin/python3"
         else
             echo "✅ UV environment ready (not activated - script was executed, not sourced)"
             echo "   To activate: source $VENV_NAME/bin/activate"
@@ -495,11 +495,11 @@ with open('pyproject.toml', 'r') as f:
         deps = deps_match.group(1)
         # Extract quoted strings (package names)
         packages = re.findall(r'\"([^\"]+)\"', deps)
-        with open('/tmp/hafiscal_deps.txt', 'w') as out:
+        with open('/tmp/low2005_deps.txt', 'w') as out:
             for pkg in packages:
                 if not pkg.strip().startswith('#'):
                     out.write(pkg.strip() + '\n')
-" && pip install -r /tmp/hafiscal_deps.txt --quiet && rm -f /tmp/hafiscal_deps.txt
+" && pip install -r /tmp/low2005_deps.txt --quiet && rm -f /tmp/low2005_deps.txt
         fi
     elif [[ -f "requirements.txt" ]]; then
         pip install -r requirements.txt --quiet
@@ -521,8 +521,8 @@ with open('pyproject.toml', 'r') as f:
     echo ""
     
     # Export environment variables
-    export HAFISCAL_PYTHON="$VENV_PATH/bin/python"
-    export HAFISCAL_PYTHON3="$VENV_PATH/bin/python3"
+    export LOW2005_PYTHON="$VENV_PATH/bin/python"
+    export LOW2005_PYTHON3="$VENV_PATH/bin/python3"
     
     echo "To verify the installation:"
     echo "  python --version"
@@ -741,8 +741,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         echo "✅ Environment activated!"
         
         # Export environment variables for use in subscripts
-        export HAFISCAL_PYTHON="$VENV_PATH/bin/python"
-        export HAFISCAL_PYTHON3="$VENV_PATH/bin/python3"
+        export LOW2005_PYTHON="$VENV_PATH/bin/python"
+        export LOW2005_PYTHON3="$VENV_PATH/bin/python3"
         echo ""
     else
         # Interactive mode when run directly (not from reproduce.sh)
@@ -752,8 +752,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             echo "✅ Environment activated!"
         
         # Export environment variables for use in subscripts
-        export HAFISCAL_PYTHON="$VENV_PATH/bin/python"
-        export HAFISCAL_PYTHON3="$VENV_PATH/bin/python3"
+        export LOW2005_PYTHON="$VENV_PATH/bin/python"
+        export LOW2005_PYTHON3="$VENV_PATH/bin/python3"
             echo ""
             echo "To verify the installation:"
             echo "  python --version"
@@ -772,8 +772,8 @@ else
     echo "✅ Environment activated!"
     
     # Export environment variables for use in subscripts (PLAN A)
-    export HAFISCAL_PYTHON="$VENV_PATH/bin/python"
-    export HAFISCAL_PYTHON3="$VENV_PATH/bin/python3"
+    export LOW2005_PYTHON="$VENV_PATH/bin/python"
+    export LOW2005_PYTHON3="$VENV_PATH/bin/python3"
     echo ""
 fi
 

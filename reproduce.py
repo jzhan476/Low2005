@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-HAFiscal Reproduction Script (Python Version)
+Low2005 Reproduction Script (Python Version)
 
-Cross-platform reproduction script for HAFiscal project.
+Cross-platform reproduction script for the Low2005 REMARK repository.
 Mirrors the functionality of reproduce.sh with identical CLI interface.
 """
 
@@ -93,8 +93,8 @@ def check_symlinks():
             print()
             print("3. Clone the repository FROM WITHIN WSL2:")
             print("   cd ~")
-            print("   git clone https://github.com/econ-ark/HAFiscal.git")
-            print("   cd HAFiscal")
+            print("   git clone https://github.com/jzhan476/Low2005.git")
+            print("   cd Low2005")
             print()
             print("4. Run this script again:")
             print("   python3 reproduce.py")
@@ -210,7 +210,7 @@ class ReproductionScript:
     def show_interactive_menu(self) -> Optional[str]:
         """Show interactive menu and return user's choice."""
         print("=" * 40)
-        print("   HAFiscal Reproduction Options")
+        print("   Low2005 Reproduction Options")
         print("=" * 40)
         print()
         print("Please select what you would like to reproduce:")
@@ -457,7 +457,7 @@ class ReproductionScript:
             scope: Which environment(s) to test - 'texlive', 'comp', 'comp_uv', or 'both' (default)
         """
         print("=" * 40)
-        print("Testing HAFiscal Environment Setup")
+        print("Testing Low2005 Environment Setup")
         print("=" * 40)
         print()
         
@@ -606,7 +606,7 @@ class ReproductionScript:
         if overall_status == 0:
             print("✅ All environment tests PASSED")
             print()
-            print("Your system is ready to reproduce HAFiscal results!")
+            print("Your system is ready to reproduce Low2005 results!")
             print()
             print("Next steps:")
             print("  python3 reproduce.py --docs      # Compile documents")
@@ -618,8 +618,7 @@ class ReproductionScript:
             print()
             print("For help, see:")
             print("  README.md - Setup instructions")
-            print("  README/INSTALLATION.md - Platform-specific guides")
-            print("  README/TROUBLESHOOTING.md - Common issues")
+            print("  reproduce/README.md - Reproduction scripts and tips")
         print()
         
         return overall_status
@@ -1001,7 +1000,7 @@ class ReproductionScript:
     def print_help(self):
         """Print detailed help message."""
         help_text = """
-HAFiscal Reproduction Script (Python Version)
+Low2005 Reproduction Script (Python Version)
 
 This script provides multiple reproduction options and includes environment testing.
 
@@ -1016,7 +1015,7 @@ OPTIONS:
                          comp_uv: Test computational (UV) environment only
                          both: Test both environments
     --docs, -d [SCOPE]  Reproduce LaTeX documents (SCOPE: main|all|figures|tables|subfiles, default: main)
-                         main: only repo root files (HAFiscal.tex, HAFiscal-Slides.tex)
+                         main: only repo root files (Low2005.tex)
                          all: root files + Figures/ + Tables/ + Subfiles/
                          figures: root files + Figures/
                          tables: root files + Tables/
@@ -1082,7 +1081,7 @@ def main():
     ensure_uv_environment()
     
     parser = argparse.ArgumentParser(
-        description="HAFiscal Reproduction Script (Python Version)",
+        description="Low2005 Reproduction Script (Python Version)",
         add_help=False,  # We'll handle help ourselves
         formatter_class=argparse.RawDescriptionHelpFormatter
     )

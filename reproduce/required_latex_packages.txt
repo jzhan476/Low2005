@@ -1,13 +1,13 @@
 # Required LaTeX Packages for HAFiscal Project
 # Last updated: 2025-12-10 (added missing packages from old GA workflow: accents, soul, amstext, etc.)
 #
-# This file lists all LaTeX packages required to compile HAFiscal.tex and HAFiscal-Slides.tex
+# This file lists all LaTeX packages required to compile Low2005.tex (or HAFiscal.tex)
 # with ONLY texlive-latex-base + texlive-latex-recommended installed.
 #
 # Packages marked with ✓ were verified essential through iterative compilation.
 # Packages marked with ❌ were removed as unnecessary.
 #
-# Total packages needed beyond base+recommended: ~62 (includes beamer and pgf for presentations)
+# Total packages needed beyond base+recommended: ~60 (includes pgf for graphics/svg)
 
 # NOTE: The following packages are NOT listed here because they are already included
 #       in collection-basic or base LaTeX: amsfonts, amsmath, amssymb, amstext, amsthm, array, babel, caption, color, enumerate, epstopdf, expl3, fancyhdr, float, fontenc, geometry, graphicx, hyperref, inputenc, l3kernel, l3packages, natbib, verbatim
@@ -45,7 +45,7 @@ booktabs
 # float                     # ❌ Already in collection-basic or base LaTeX
 floatrow
 # graphicx                  # ❌ Already in collection-basic or base LaTeX
-pgf            # ✓ PGF/TikZ graphics (required by beamer for HAFiscal-Slides.tex)
+pgf            # ✓ PGF/TikZ graphics (e.g. svg.sty)
 rotating
 subcaption
 subfig
@@ -77,9 +77,6 @@ subfiles       # ✓ Multi-file document structure (CRITICAL - used extensively)
 titlesec       # ✓ Section title formatting
 tocloft        # ✓ Table of contents formatting
 
-## PRESENTATION (For HAFiscal-Slides.tex)
-beamer         # ✓ Presentation document class - automatically loads many packages (amsmath, amssymb, graphicx, xcolor, hyperref, etc.)
-
 ## CROSS-REFERENCES AND LINKS
 # hyperref                  # ❌ Already in collection-basic or base LaTeX
 showlabels     # ✓ Display equation/figure/table labels in margins for review (CRITICAL for Latest)
@@ -105,7 +102,7 @@ moreverb       # ✓ Enhanced verbatim - provides \begin{verbatimwrite} (CRITICA
 ncctools       # ✓ Various utilities from ncclatex bundle
 nth            # ✓ Ordinal number formatting (\nth{20}, etc.)
 optional       # ✓ Conditional compilation
-pdfsuppressruntime  # ✓ Suppresses runtime warnings (required by HAFiscal-Slides.tex)
+pdfsuppressruntime  # ✓ Suppresses runtime warnings (loaded by @local/local.sty)
 pifont
 placeins
 siunitx
@@ -129,8 +126,6 @@ cm-super       # ✓ Computer Modern fonts with extended character support
 # l3kernel                  # ❌ Already in collection-basic or base LaTeX ✓ LaTeX3 kernel (foundation for expl3)
 
 # l3packages                # ❌ Already in collection-basic or base LaTeX ✓ LaTeX3 packages
-
-pgf            # ✓ PGF/TikZ graphics system (already pulled by beamer, but explicit for clarity)
 
 ## ❌ PACKAGES ELIMINATED (Not Actually Used)
 # The following packages were required by .cls/.sty files but not used in HAFiscal.

@@ -25,7 +25,6 @@
 
 # Scripts without extension use LF
 reproduce text eol=lf
-reproduce_min text eol=lf
 
 # Binary files
 *.pdf binary
@@ -36,7 +35,3 @@ reproduce_min text eol=lf
 *.eps binary
 *.svg binary
 
-# Symlink protection
-# Files in images/ directory should always be stored as symlinks, never as regular files
-# This prevents accidental conversion on systems with limited symlink support
-images/* symlink

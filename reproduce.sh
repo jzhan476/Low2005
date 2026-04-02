@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# HAFiscal Reproduction Script
-# This script provides options for reproducing different aspects of the HAFiscal project
+# Low2005 Reproduction Script
+# Reproduce LaTeX PDFs and the HARK replication (Code/Python/Low2005.py)
 
 set -eo pipefail
 
@@ -94,7 +94,7 @@ init_logging() {
     
     # Write initial log entries
     log INFO "==================================="
-    log INFO "HAFiscal Reproduction Script Started"
+    log INFO "Low2005 Reproduction Script Started"
     log INFO "Command: $0 $*"
     log INFO "Working directory: $(pwd)"
     log INFO "Log file: $LOG_FILE"
@@ -557,7 +557,7 @@ benchmark_end() {
     # Capture system info and create benchmark
     local capture_script="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/reproduce/benchmarks/capture_system_info.py"
     if [[ -f "$capture_script" ]]; then
-        local temp_sysinfo="/tmp/hafiscal_bench_$$_sysinfo.json"
+        local temp_sysinfo="/tmp/low2005_bench_$$_sysinfo.json"
         python3 "$capture_script" --pretty --output "$temp_sysinfo" 2>/dev/null || true
         
         local output_file="$benchmark_dir/$filename"
@@ -647,7 +647,7 @@ trap 'exit_code=$?; print_summary $exit_code; cleanup_temp_files; benchmark_end 
 
 show_help() {
     cat << EOF
-HAFiscal Reproduction Script
+Low2005 Reproduction Script
 
 This script provides multiple reproduction options and includes environment testing.
 
@@ -657,30 +657,19 @@ USAGE:
 OPTIONS:
     --help, -h          Show this help message
     --envt, -e          Test environment setup (TeX Live + Python/computational)
-    --data [SCOPE]      Reproduce empirical data or figures from results
-                         SCOPE: scf|IMPC|LP|all (default: scf)
-                         scf: empirical data moments from SCF 2004 (~1 minute + download time)
-                         IMPC: Intertemporal MPC figures from pre-computed results
-                         LP: Lorenz Points figures from pre-computed results
-                         all: all figures from results (IMPC + LP)
+    --data [SCOPE]      Legacy figure hook (IMPC|LP|all; default: all)
+                         Low2005 figures come from Code/Python/Low2005.py (--comp min).
+                         This option only runs the no-op legacy script for compatibility.
     --comp, -c [SCOPE]  Reproduce computational results (SCOPE: min|full|max, default: min)
-                         min: minimal computational results (~1 hour)
-                         full: all computational results needed for the printed document (4-5 days on a high-end 2025 laptop)
-                         max: full results + robustness (Step 3: Splurge=0 for Online Appendix) (~6 days on a high-end 2025 laptop)
+                         min|full: run Code/Python/Low2005.py (HARK replication; typically minutes)
+                         max: same as full in this package (legacy alias)
     --docs, -d [SCOPE]  Reproduce LaTeX documents (SCOPE: main|all|figures|tables|subfiles, default: main)
-                         main: only the paper --- HAFiscal.tex
+                         main: only the paper --- Low2005.tex
                          all: the paper + individual Figures/ + Tables/ + Subfiles/
                          figures: the paper + Figures/
                          tables: the paper + Tables/
                          subfiles: the paper + Subfiles/
-    --use-latest-scf-data  Download latest SCF 2004 data from Fed and auto-adjust to 2013$
-                         Downloads 2022$ data, divides by 1.1587 to convert to 2013$
-                         Results will match paper exactly. Use with --data flag
-                         ⚠️  WARNING: Assumes downloaded data is in 2022 dollars.
-                            When Fed updates inflation adjustments, update the
-                            inflation factor in adjust_scf_inflation.py
-                         See docs/SCF_DATA_VINTAGE.md for details
-    --all, -a           Reproduce everything: data moments, all computational results + all documents
+    --all, -a           Reproduce everything: computational replication + documents (legacy figure step is a no-op)
     --interactive, -i   Show interactive menu (delegates to reproduce.py)
     --dry-run           Show commands that would be executed (only with --docs)
     --verbose, -v       Show detailed command tracing in terminal (set -x output)
@@ -728,16 +717,13 @@ EXAMPLES:
     ./reproduce.sh --docs tables             # Compile repo root + Tables/
     ./reproduce.sh --docs subfiles           # Compile repo root + Subfiles/
     ./reproduce.sh --docs all --stop-on-error # Stop on first compilation error
-    ./reproduce.sh --comp min                # Minimal computational results (~1 hour)
-    ./reproduce.sh --comp full               # All computational results for printed document (4-5 days on a high-end 2025 laptop)
-    ./reproduce.sh --comp max                # Maximum computational results including robustness (~6 days on a high-end 2025 laptop)
-    ./reproduce.sh --data                    # Empirical data moments from SCF 2004 (~1 minute + download)
-    ./reproduce.sh --data scf                # Empirical data moments (default)
-    ./reproduce.sh --data IMPC               # Generate IMPC figures from results
-    ./reproduce.sh --data LP                 # Generate Lorenz Points figures
-    ./reproduce.sh --data all                # Generate all figures from results
-    ./reproduce.sh --data --use-latest-scf-data  # Download latest Fed data, auto-adjust to 2013$ (matches paper)
-    ./reproduce.sh --all                     # Everything: all documents + all computational results
+    ./reproduce.sh --comp min                # Low (2005) HARK replication (Code/Python/Low2005.py)
+    ./reproduce.sh --comp full               # Same replication (full script path; legacy name)
+    ./reproduce.sh --comp max                # Same as full (legacy alias)
+    ./reproduce.sh --data                    # Legacy no-op figure hook (default scope: all)
+    ./reproduce.sh --data IMPC               # Same legacy hook (IMPC)
+    ./reproduce.sh --data all                # Same legacy hook (all)
+    ./reproduce.sh --all                     # Computational + docs (full workflow)
     
     # Advanced examples:
     BENCHMARK=false ./reproduce.sh --docs main   # Disable benchmarking
@@ -747,7 +733,7 @@ EOF
 
 show_interactive_menu() {
     echo "========================================"
-    echo "   HAFiscal Reproduction Options"
+    echo "   Low2005 Reproduction Options"
     echo "========================================"
     echo ""
     echo "Please select what you would like to reproduce:"
@@ -761,19 +747,16 @@ show_interactive_menu() {
     echo "   - Estimated time: A few minutes"
     echo ""
     echo "3) Minimal Computational Results"
-    echo "   - Reproduces a subset of computational results"
-    echo "   - Estimated time: ~1 hour"
-    echo "   - Good for testing and quick verification"
+    echo "   - Runs Code/Python/Low2005.py (HARK replication)"
+    echo "   - Estimated time: typically a few minutes"
     echo ""
     echo "4) All Computational Results"
-    echo "   - Reproduces all computational results from the paper"
-    echo "   - ⚠️  WARNING: This may take 4-5 DAYS on a high-end 2025 laptop"
-    echo "   - Requires significant computational resources"
+    echo "   - Same HARK replication as (3) in this package"
+    echo "   - Estimated time: typically a few minutes"
     echo ""
     echo "5) Everything"
-    echo "   - All documents + all computational results"
-    echo "   - ⚠️  WARNING: This may take 4-5 DAYS on a high-end 2025 laptop"
-    echo "   - Complete reproduction of the entire project"
+    echo "   - Computational replication + documents (and legacy no-op figure step)"
+    echo "   - Estimated time: mostly LaTeX build + a few minutes Python"
     echo ""
     echo "6) Exit"
     echo ""
@@ -940,23 +923,17 @@ reproduce_all_results() {
     local start_time=$(date +%s)
     
     log INFO "========================================"
-    log INFO "Complete Reproduction: All Computational Results + Documents"
+    log INFO "Complete Reproduction: Computational + Documents"
     log INFO "========================================"
     echo ""
-    log WARNING "This process may take 4-5 DAYS on a high-end 2025 laptop"
-    log INFO "This will reproduce (in order):"
-    log INFO "  1. All computational results"
-    log INFO "  2. All figures from results (IMPC + Lorenz Points)"
-    log INFO "  3. All documents (LaTeX compilation)"
-    echo ""
-    log INFO "Make sure you have:"
-    log INFO "- Sufficient computational resources"
-    log INFO "- Stable power supply" 
-    log INFO "- No other intensive processes running"
+    log INFO "This will run (in order):"
+    log INFO "  1. Code/Python/Low2005.py (HARK replication)"
+    log INFO "  2. Legacy figures-from-results step (no-op for Low2005)"
+    log INFO "  3. LaTeX documents"
     echo ""
     
     if is_interactive; then
-        echo -n "Are you sure you want to continue? (y/N): "
+        echo -n "Continue? (y/N): "
         read -r confirm
         
         if [[ "$confirm" =~ ^[Yy]$ ]]; then
@@ -967,7 +944,7 @@ reproduce_all_results() {
             return 0
         fi
     else
-        log INFO "Running in non-interactive mode - proceeding with complete reproduction..."
+        log INFO "Non-interactive mode - proceeding..."
         echo ""
     fi
     
@@ -1037,7 +1014,7 @@ reproduce_minimal_results() {
     log INFO "Reproducing Minimal Computational Results..."
     log INFO "========================================"
     echo ""
-    log INFO "This will reproduce a subset of results (~1 hour)"
+    log INFO "This runs Code/Python/Low2005.py (typically a few minutes)"
     log INFO "Start time: $(date '+%Y-%m-%d %H:%M:%S')"
     echo ""
     
@@ -1066,32 +1043,12 @@ reproduce_all_computational_results() {
     
     log PROGRESS "Starting full computational results reproduction"
     log INFO "========================================"
-    log INFO "Reproducing All Computational Results..."
+    log INFO "Reproducing All Computational Results (Low2005 HARK script)..."
     log INFO "========================================"
     echo ""
-    log WARNING "This process may take 4-5 DAYS on a high-end 2025 laptop"
-    log INFO "Make sure you have:"
-    log INFO "- Sufficient computational resources"
-    log INFO "- Stable power supply"
-    log INFO "- No other intensive processes running"
+    log INFO "Runs reproduce/reproduce_computed.sh → Code/Python/Low2005.py"
     log INFO "Start time: $(date '+%Y-%m-%d %H:%M:%S')"
     echo ""
-    
-    if is_interactive; then
-        echo -n "Are you sure you want to continue? (y/N): "
-        read -r confirm
-        
-        if [[ "$confirm" =~ ^[Yy]$ ]]; then
-            echo ""
-            log INFO "Starting full computational reproduction..."
-        else
-            log INFO "Cancelled by user."
-            return 0
-        fi
-    else
-        log INFO "Running in non-interactive mode - proceeding with full reproduction..."
-        echo ""
-    fi
     
     if [[ -f "./reproduce/reproduce_computed.sh" ]]; then
         log INFO "Executing: ./reproduce/reproduce_computed.sh"
@@ -1117,7 +1074,7 @@ test_environment_comprehensive() {
     
     log PROGRESS "Starting environment testing (scope: $scope)"
     log INFO "========================================"
-    log INFO "Testing HAFiscal Environment Setup"
+    log INFO "Testing Low2005 Environment Setup"
     log INFO "========================================"
     echo ""
     
@@ -1308,7 +1265,7 @@ test_environment_comprehensive() {
             echo ""
             echo "Please set up an environment:"
             echo "  Option 1 (Recommended): ./reproduce/reproduce_environment_comp_uv.sh"
-            echo "  Option 2 (Traditional):  conda env create -f environment.yml"
+            echo "  Option 2 (Traditional):  conda env create -f environment.yml  # env name: low2005"
             overall_status=1
         fi
         echo ""
@@ -1334,7 +1291,7 @@ test_environment_comprehensive() {
             echo ""
         fi
         
-        echo "Your system is ready to reproduce HAFiscal results!"
+        echo "Your system is ready to reproduce Low2005 results!"
         echo ""
         echo "Next steps:"
         echo "  ./reproduce.sh --docs      # Compile documents"
@@ -1346,8 +1303,7 @@ test_environment_comprehensive() {
         echo ""
         echo "For help, see:"
         echo "  README.md - Setup instructions"
-        echo "  README/INSTALLATION.md - Platform-specific guides"
-        echo "  README/TROUBLESHOOTING.md - Common issues"
+        echo "  README.md and reproduce/README.md - Setup and troubleshooting"
     fi
     echo ""
     
@@ -1485,7 +1441,7 @@ test_environment() {
     else
         echo "  ⚠️  No environment detected. Run one of:"
         echo "     ./reproduce/reproduce_environment_comp_uv.sh  (recommended, fast)"
-        echo "     conda env create -f environment.yml      (traditional)"
+        echo "     conda env create -f environment.yml      (traditional; env name: low2005)"
     fi
     
     # Report results
@@ -1578,7 +1534,7 @@ run_automatic_reproduction() {
     # Step 4: All computational results  
     echo ">>> Step $step/$total_steps: Reproducing all computational results..."
     echo "========================================"
-    echo "⚠️  WARNING: This final step may take 4-5 DAYS on a high-end 2025 laptop!"
+    echo "ℹ️  Full computational step runs Code/Python/Low2005.py (typically minutes)."
     if reproduce_all_results; then
         echo "✅ Step $step/$total_steps completed successfully"
     else
@@ -1685,7 +1641,7 @@ DEBUG=false
 ACTION=""
 DOCS_SCOPE="main"  # default scope for --docs
 COMP_SCOPE="min"   # default scope for --comp
-DATA_SCOPE="scf"   # default scope for --data
+DATA_SCOPE="all"   # default scope for --data (legacy figure hook)
 ENVT_SCOPE="both"  # default scope for --envt
 SHOW_LABELS="${SHOW_LABELS:-}"  # default: use .tex file default
 
@@ -1757,18 +1713,12 @@ while [[ $# -gt 0 ]]; do
         --data)
             ACTION="data"
             shift
-            # Check if next argument is a scope specifier
-            if [[ $# -gt 0 && "$1" =~ ^(scf|IMPC|LP|all)$ ]]; then
+            if [[ $# -gt 0 && "$1" =~ ^(IMPC|LP|all)$ ]]; then
                 DATA_SCOPE="$1"
                 shift
             else
-                # Default to scf if no scope specified
-                DATA_SCOPE="scf"
+                DATA_SCOPE="all"
             fi
-            ;;
-        --use-latest-scf-data)
-            USE_LATEST_SCF_DATA=true
-            shift
             ;;
         --all|-a)
             ACTION="all"
@@ -2033,8 +1983,8 @@ ensure_uv_environment() {
             fi
             
             # Export environment variables
-            export HAFISCAL_PYTHON="$expected_venv/bin/python"
-            export HAFISCAL_PYTHON3="$expected_venv/bin/python3"
+            export LOW2005_PYTHON="$expected_venv/bin/python"
+            export LOW2005_PYTHON3="$expected_venv/bin/python3"
             log INFO "UV environment already active: $VIRTUAL_ENV"
             return 0
         fi
@@ -2060,8 +2010,8 @@ ensure_uv_environment() {
             if [[ "$actual_python" == "$expected_python"* ]]; then
                 log SUCCESS "Switched to expected virtual environment"
                 log INFO "Python: $actual_python"
-                export HAFISCAL_PYTHON="$expected_venv/bin/python"
-                export HAFISCAL_PYTHON3="$expected_venv/bin/python3"
+                export LOW2005_PYTHON="$expected_venv/bin/python"
+                export LOW2005_PYTHON3="$expected_venv/bin/python3"
                 return 0
             fi
         fi
@@ -2143,8 +2093,8 @@ ensure_uv_environment() {
             fi
             
             # Export environment variables for subscripts
-            export HAFISCAL_PYTHON="$expected_venv/bin/python"
-            export HAFISCAL_PYTHON3="$expected_venv/bin/python3"
+            export LOW2005_PYTHON="$expected_venv/bin/python"
+            export LOW2005_PYTHON3="$expected_venv/bin/python3"
             
             return 0
         else
@@ -2210,8 +2160,8 @@ ensure_uv_environment() {
             if [[ "$actual_python" == "$expected_python"* ]]; then
                 log SUCCESS "UV environment activated successfully after recreation"
                 log INFO "Python: $actual_python"
-                export HAFISCAL_PYTHON="$expected_venv/bin/python"
-                export HAFISCAL_PYTHON3="$expected_venv/bin/python3"
+                export LOW2005_PYTHON="$expected_venv/bin/python"
+                export LOW2005_PYTHON3="$expected_venv/bin/python3"
                 return 0
             fi
         fi
@@ -2312,8 +2262,8 @@ case "$ACTION" in
                 if [[ -z "${VIRTUAL_ENV:-}" ]] || [[ "$VIRTUAL_ENV" != "$expected_venv"* ]]; then
                     # Activate in script's subshell (for any subprocesses)
                     source "$expected_venv/bin/activate"
-                    export HAFISCAL_PYTHON="$expected_venv/bin/python"
-                    export HAFISCAL_PYTHON3="$expected_venv/bin/python3"
+                    export LOW2005_PYTHON="$expected_venv/bin/python"
+                    export LOW2005_PYTHON3="$expected_venv/bin/python3"
                     
                     # Note: This activation doesn't persist to user's shell after script exits
                     # User needs to manually activate if they want it in their shell
@@ -2355,9 +2305,8 @@ case "$ACTION" in
                 exit $?
                 ;;
             max)
-                # Set environment variable to enable Step 3 (robustness with Splurge=0)
-                log INFO "Maximum scope enabled - includes Step 3 robustness checks"
-                export HAFISCAL_RUN_STEP_3="true"
+                log INFO "Maximum scope: same HARK run as min/full (legacy env: LOW2005_RUN_STEP_3)"
+                export LOW2005_RUN_STEP_3="true"
                 reproduce_all_computational_results
                 exit $?
                 ;;
@@ -2371,30 +2320,6 @@ case "$ACTION" in
     data)
         init_logging "data" "$DATA_SCOPE"
         case "$DATA_SCOPE" in
-            scf)
-                log PROGRESS "Starting empirical data moments reproduction"
-                log INFO "========================================"
-                log INFO "Reproducing Empirical Data Moments..."
-                log INFO "========================================"
-                echo ""
-                if [[ "$USE_LATEST_SCF_DATA" == "true" ]]; then
-                    log WARNING "⚠️  IMPORTANT: Using latest SCF data from Federal Reserve"
-                    log WARNING "   Assumption: Downloaded data is in 2022 dollars"
-                    log WARNING "   Inflation adjustment: 1.1587 (2022$ → 2013$)"
-                    log WARNING "   ⚠️  When Fed updates inflation adjustments:"
-                    log WARNING "      1. Update inflation factor in adjust_scf_inflation.py"
-                    log WARNING "      2. Verify factor by comparing to archived version"
-                    log WARNING "      3. Update documentation"
-                    log INFO ""
-                    log INFO "Using latest SCF data with auto-adjustment to 2013$"
-                    log INFO "Executing: ./reproduce/reproduce_data_moments.sh --use-latest-scf-data"
-                    ./reproduce/reproduce_data_moments.sh --use-latest-scf-data 2>&1 | tee -a "$LOG_FILE"
-                else
-                    log INFO "Executing: ./reproduce/reproduce_data_moments.sh"
-                    ./reproduce/reproduce_data_moments.sh 2>&1 | tee -a "$LOG_FILE"
-                fi
-                exit $?
-                ;;
             IMPC)
                 log PROGRESS "Generating IMPC figures from results"
                 log INFO "Executing: ./reproduce/reproduce_figures_from_results.sh IMPC"
@@ -2415,7 +2340,7 @@ case "$ACTION" in
                 ;;
             *)
                 log ERROR "Unknown data scope: $DATA_SCOPE"
-                log ERROR "Valid scopes: scf, IMPC, LP, all"
+                log ERROR "Valid scopes: IMPC, LP, all"
                 exit 1
                 ;;
         esac
@@ -2442,7 +2367,7 @@ case "$ACTION" in
     "")
         # No arguments provided - show helpful examples (no logging for this)
         echo "========================================"
-        echo "HAFiscal Reproduction Script"
+        echo "Low2005 Reproduction Script"
         echo "========================================"
         echo ""
         echo "Run with arguments to reproduce different parts of the project."
@@ -2454,12 +2379,12 @@ case "$ACTION" in
         echo "  ./reproduce.sh --envt texlive       # Test LaTeX only"
         echo "  ./reproduce.sh --envt comp_uv       # Test Python/UV only"
         echo ""
-        echo "  # Empirical data:"
-        echo "  ./reproduce.sh --data               # SCF 2004 moments (~1 min)"
+        echo "  # Legacy figure hook (no-op; use --comp min for Low2005 figures):"
+        echo "  ./reproduce.sh --data               # default: all"
         echo ""
         echo "  # Computational results:"
-        echo "  ./reproduce.sh --comp min           # Quick test (~1 hour)"
-        echo "  ./reproduce.sh --comp full          # Full results (4-5 days)"
+        echo "  ./reproduce.sh --comp min           # Low2005 HARK script (minutes)"
+        echo "  ./reproduce.sh --comp full          # Same script (legacy name)"
         echo ""
         echo "  # LaTeX documents:"
         echo "  ./reproduce.sh --docs main          # Compile paper only"

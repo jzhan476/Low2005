@@ -129,6 +129,5 @@ source .venv-linux/bin/activate
 
 - `reproduce.sh` - Platform detection and venv path resolution
 - `reproduce/reproduce_environment_comp_uv.sh` - Creates platform-specific venvs
-- `reproduce/reproduce_data_moments.sh` - Uses platform-specific venvs
 - `.gitignore` - Added platform-specific venv patterns
 - `reproduce/migrate_to_platform_venvs.sh` - Migration helper script

@@ -1,4 +1,4 @@
-% HAFiscal local-qe-figs-and-tables.sty - Minimal packages for standalone figures/tables
+% local-qe-figs-and-tables.sty — minimal packages for integrated figures/tables
 % This file contains ONLY the packages needed for Figures/ and Tables/ .tex files
 % to compile as standalone documents in the HAFiscal-QE submission
 %
@@ -9,7 +9,7 @@
 % This file is also sourced by local-qe.sty to avoid duplication
 
 \providecommand{\pregenmark}{}
-\ProvidesPackage{local-qe-figs-and-tables}[2025/10/11 HAFiscal QE figures/tables minimal package]
+\ProvidesPackage{local-qe-figs-and-tables}[2025/10/11 Low2005 figures/tables minimal package]
 
 % ═══════════════════════════════════════════════════════════════════════════
 % ADD PARENT DIRECTORY TO INPUT SEARCH PATH
@@ -89,27 +89,30 @@
   }%
 }{%
   % Not using subfiles - likely a QE standalone figure/table
-  % Try parent directory for bibliography (explicitly check for HAFiscal.bib)
-  \IfFileExists{../HAFiscal.bib}{%
-    \renewcommand{\bibfilesfound}{../HAFiscal}%
-    \typeout{Standalone figure/table: Using ../HAFiscal.bib for bibliography}%
+  % Try parent directory for bibliography (Low2005.bib or legacy HAFiscal.bib)
+  \IfFileExists{../Low2005.bib}{%
+    \renewcommand{\bibfilesfound}{../Low2005}%
+    \typeout{Standalone figure/table: Using ../Low2005.bib for bibliography}%
   }{%
-    % Fallback: try using \texname in parent directory
-    \IfFileExists{../\texname.bib}{%
-      \renewcommand{\bibfilesfound}{../\texname}%
-      \typeout{Standalone figure/table: Using ../\texname.bib for bibliography}%
+    \IfFileExists{../HAFiscal.bib}{%
+      \renewcommand{\bibfilesfound}{../HAFiscal}%
+      \typeout{Standalone figure/table: Using ../HAFiscal.bib for bibliography}%
     }{%
-      % If not found, try current directory (main document context)
-      \IfFileExists{\texname.bib}{%
-        \bibfilesfind{\texname}%
-        \typeout{Main document mode: Using \bibfilesfound for bibliography}%
+      \IfFileExists{../\texname.bib}{%
+        \renewcommand{\bibfilesfound}{../\texname}%
+        \typeout{Standalone figure/table: Using ../\texname.bib for bibliography}%
       }{%
-        \renewcommand{\bibfilesfound}{}%
-        \typeout{No bibliography found (standalone figure/table without parent .bib)}%
+        \IfFileExists{\texname.bib}{%
+          \bibfilesfind{\texname}%
+          \typeout{Main document mode: Using \bibfilesfound for bibliography}%
+        }{%
+          \renewcommand{\bibfilesfound}{}%
+          \typeout{No bibliography found (standalone figure/table without parent .bib)}%
+        }%
       }%
     }%
   }%
-  }
+}%
 \fi
 \makeatother
 % ═══════════════════════════════════════════════════════════════════════════

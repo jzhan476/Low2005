@@ -1,0 +1,204 @@
+% -*- Mode: LaTeX; TeX-PDF-mode: t; -*-  # Config emacs auctex
+\input{./._relpath-to-latexroot.ltx}    % Set paths to find resources (defines \latexroot and loads tex-paths.ltx)
+
+\documentclass[titlepage, headings=optiontotocandhead]{econark} % embedded toc
+
+% Definitions unique to this paper (showlabels config now in local.sty)
+\usepackage{local}                % Local package definitions and setup
+\usepackage{local-qe}             % local-qe gets pkgs req for qe
+
+\bibliographystyle{econark}       % based on econometrica
+
+% Load metadata BEFORE hypersetup (SST pattern)
+\input{\latexroot/@local/metadata.ltx}
+
+% When compiling Web version of paper, construct targets/anchors
+\weborpdf{ % compiling web version
+  % execute this version if compiling with make4ht
+  \hypersetup{destlabel=true} % set up html labels
+
+}{
+  % execute this version if compiling with pdflatex
+  \provideboolean{showPageHead}{\setboolean{showPageHead}{true}}
+
+  % Enhanced PDF metadata for AI systems and cross-format discovery
+  % Uses macros from @local/metadata.ltx (SST pattern)
+  \hypersetup{
+    pdftitle={\PDFTitle},
+    pdfauthor={\PDFAuthor},
+    pdfsubject={\PDFSubject},
+    pdfkeywords={\PDFKeywords}
+  }
+}
+
+\webonly{ % footnotes do not work when there is no page footer
+  % execute this version if compiling with make4ht
+  \section*{Endnotes}
+  \theendnotes
+}
+
+\begin{document}
+
+%% ----- Title page -----
+\webonly{
+  \newcommand{\versn}{Web}
+}
+
+\title{Low (2005): Self-Insurance in a Life-Cycle Model  of Labour Supply and Savings}
+
+\author{Hamish W. Low\authNum}
+
+\keywords{Precautionary saving; Life-cycle labour supply}
+
+\jelclass{D91; H31 \\[0pt]
+  \href{https://econ-ark.org}{\includegraphics[width=1.5cm]{\latexroot/@resources/econ-ark/PoweredByEconARK}}
+}
+
+\date{\today}
+
+\maketitle
+\vspace{-0.5\baselineskip}
+
+\whenintegrated{\label{abstract}} % integrated doc: SST for labels
+\begin{verbatimwrite}{Low2005-Abstract.txt}
+This paper analyses the incentives to work and to save over the life cycle in the presence of incomplete markets. In a calibrated, partial equilibrium model, flexibility in hours worked changes asset age-profiles: borrowing when young is greater and saving when middle-aged is greater than when labour supply is fixed. Uncertainty causes individuals to work longer hours and to consume less when young. With flexibility over hours, accumulating precautionary assets incurs less of a utility cost and so the level of saving is greater. Further, allowing for flexibility and uncertainty means simulated hours of work and consumption more closely match the age profiles in the data.
+\end{verbatimwrite}
+\begin{abstract}
+  \input{Low2005-Abstract.txt}
+\end{abstract}
+\vspace{-0.5\baselineskip}
+
+\whenintegrated{\label{links}} % integrated doc: SST for labels
+
+\providecommand{\REMARK}{\href{https://github.com/econ-ark/REMARK}{REMARK}}
+\begin{footnotesize}
+  \setlength{\parskip}{0pt}
+  \parbox{0.9\textwidth}{
+    \begin{tabbing}
+      \texttt{~~~~~~~~~~~~~~~~~~~~~~~} \= \=  \\
+      \texttt{~~~~GitHub~Repo:~~~~~~~} \> \> \texttt{\href{https://github.com/\owner/\projectname}{https://github.com/\owner/\projectname}} \\
+      \texttt{~~~~~~~~~~~~~~~~~html:~} \> \> \texttt{\href{https://\owner.github.io/\projectname/}{https://\owner.github.io/\projectname/}} \\
+      \texttt{~~~~~~~~~~~~~~~~~~PDF:~} \> \> \texttt{\href{https://github.com/\owner/\projectname/blob/master/Low2005.pdf}{Low2005.pdf}} \\
+      \texttt{~~~~~~~~~~~~~~~~~~~~~~~} \> \>  \\
+      \texttt{~~~~Replication~Package:~} \> \> \texttt{\href{https://doi.org/10.5281/zenodo.17861977}{10.5281/zenodo.17861977}} \\
+      \texttt{~~~~~~~~~~~~~~~~~~~~~~~} \> \>  \\
+      \texttt{~~~~Other~Materials:~~~} \> \> \\
+      \texttt{~~~~~Replication~code:~} \> \> \texttt{\href{https://github.com/\owner/\projectname/tree/master/Code/Python}{Code/Python}} \\
+    \end{tabbing}
+  }
+\end{footnotesize}
+\vspace{-0.3\baselineskip}
+
+\centerline{Forthcoming, \textit{Quantitative Economics}}
+\vspace{-0.3\baselineskip}
+
+\begin{authorsinfo}
+  \noindent \name{\href{https://www.econ2.jhu.edu/people/ccarroll}{Carroll: Department of Economics, Johns Hopkins University}, \href{mailto:ccarroll@jhu.edu}{\texttt{ccarroll@jhu.edu}}, and \href{https://nber.org}{NBER}}. \newline
+  \name{Crawley: Federal Reserve Board, \href{mailto:edmund.s.crawley@frb.gov}{\texttt{edmund.s.crawley@frb.gov}} } \newline
+  \name{Du: Johns Hopkins University, \href{mailto:wdu9@jhu.edu}{\texttt{wdu9@jhu.edu}} } \newline
+  \name{Frankovic: Deutsche Bundesbank, \href{mailto:ivan.frankovic@bundesbank.de}{\texttt{ivan.frankovic@bundesbank.de}}} \newline
+  \name{Tretvoll: Statistics Norway and HOFIMAR at BI Norwegian Business School, \href{mailto:Hakon.Tretvoll@ssb.no}{\texttt{Hakon.Tretvoll@ssb.no}}}
+\end{authorsinfo}
+
+\pagenumbering{gobble}
+
+\whenintegrated{\label{funding-info}} % integrated doc: SST for labels
+\vspace{0.3\baselineskip}
+\begin{minipage}{\textwidth}
+  \footnotesize
+  \input{\latexroot/@local/acknowledgments.texinput}
+\end{minipage}
+
+\titlepagefinish
+
+\smartbib
+
+\pagebreak
+
+% Table of contents; to omit, \setboolean{TOC}{false} above
+\ifthenelse{\boolean{TOC}}{\pagebreak
+  \let\LaTeXStandardContentsName\contentsname
+  \renewcommand{\contentsname}{}
+  \tableofcontents
+}{}
+
+\section{Introduction}
+This trimmed version preserves the full section structure while removing most narrative detail.
+
+\subsection{Related literature}
+The full literature review is omitted in this lightweight scaffold.
+
+\section{Model}
+We retain one representative equation for compilation and structure checks:
+\begin{equation}
+  C_t = \beta \, \mathbb{E}_t[C_{t+1}] + \varepsilon_t .
+\end{equation}
+
+\section{Parameterizing the model}
+Calibration details are intentionally abbreviated.
+
+\section{Comparing fiscal stimulus policies}
+Most policy comparison text is removed; a minimal table is kept.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Illustrative policy comparison}
+  \begin{tabular}{lcc}
+    \toprule
+    Policy & Spending effect & Welfare effect \\
+    \midrule
+    Stimulus check & Medium & Medium \\
+    UI extension & High & High \\
+    Tax cut & Low & Low \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Robustness in a HANK and SAM Model}
+Detailed robustness analysis is omitted.
+
+\begin{figure}[htbp]
+  \centering
+  \fbox{\parbox{0.75\linewidth}{\centering Placeholder figure retained to satisfy minimal artifact requirements.}}
+  \caption{Placeholder robustness figure}
+\end{figure}
+
+\section{Conclusion}
+Main takeaways are intentionally shortened for the stripped document version.
+
+\pagebreak
+
+\webonly{
+  \section*{Endnotes}
+  \theendnotes
+}
+
+\addcontentsline{toc}{section}{References} % Add refs at end of TOC
+
+\clearpage
+\nocite{Bardoczy2022}
+\nocite{Blanchard2010}
+\nocite{Christiano2016}
+\nocite{DenHaan2000}
+\nocite{Gornemann2021}
+\nocite{Ravn2017}
+\nocite{Ravn2021}
+\nocite{Rotemberg1982}
+\nocite{Silva2009}
+\nocite{arsJumpsHumps}
+\nocite{carroll2020modeling}
+\nocite{den2010computational}
+\nocite{fagereng-mpc-2021}
+\nocite{rothstein2017scraping}
+\smartbib
+
+\clearpage
+\section*{Appendices}
+\addcontentsline{toc}{section}{Appendices}
+\markboth{APPENDICES}{APPENDICES}
+
+\appendix
+\section{Appendix: Minimal retained content}
+This stripped version keeps one appendix section while removing most appendix material.
+
+\end{document}

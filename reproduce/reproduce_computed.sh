@@ -1,38 +1,23 @@
 #!/bin/bash
+# Full computational reproduction for this repo: same HARK replication as --comp min.
+# (Legacy multi-day HA-Models pipeline removed; this runs Low2005 HARK replication.)
 
 set -euo pipefail
 
-# Resolve paths robustly (works even if invoked from outside repo root)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Make sure the necessary requirements are available
 source "$SCRIPT_DIR/reproduce_environment.sh"
 
-# Change directory to the location of the Python script
-cd "$PROJECT_ROOT/Code/HA-Models"
+MIN_SCRIPT="$SCRIPT_DIR/reproduce_computed_min.sh"
+if [[ -f "$MIN_SCRIPT" ]]; then
+    bash "$MIN_SCRIPT"
+else
+    echo "❌ $MIN_SCRIPT not found"
+    exit 1
+fi
 
-# Create empty version file for full reproduction
-rm -f version
-touch version
-
-# Pass HAFISCAL_RUN_STEP_3 environment variable if set
-# (defaults to false in do_all.py if not set)
-export HAFISCAL_RUN_STEP_3="${HAFISCAL_RUN_STEP_3:-false}"
-
-# Run the Python script
-# NOTE: With 'set -e', any failure here aborts the script, preventing
-# the PREGENERATED flag from being removed on a failed computation.
-python do_all.py
-
-# =============================================================================
-# REMOVE PREGENERATED FLAG AFTER SUCCESSFUL COMPUTATION
-# =============================================================================
-# After computational results are regenerated, remove the flag file that
-# triggers PREGENERATED markers in table/figure captions.
-#
 FLAG_FILE="$PROJECT_ROOT/reproduce/.results_pregenerated"
-
 if [[ -f "$FLAG_FILE" ]]; then
     echo ""
     echo "========================================"
@@ -41,8 +26,7 @@ if [[ -f "$FLAG_FILE" ]]; then
     echo ""
     echo "Removing PREGENERATED flag file..."
     rm -f "$FLAG_FILE"
-    echo "✓ Flag removed - table/figure captions will no longer show PREGENERATED markers"
-    echo "  (Recompile HAFiscal.tex to see updated captions)"
+    echo "✓ Flag removed - recompile Low2005.tex if captions referenced PREGENERATED"
     echo ""
 else
     echo ""

@@ -1,10 +1,10 @@
-# HAFiscal Reproduction Benchmarks
+# Low2005 reproduction benchmarks
 
 This directory contains benchmark data for reproduction runs, following industry-standard formats for performance tracking.
 
 ## Purpose
 
-Track and document the time required to reproduce HAFiscal results across different:
+Track and document the time required to reproduce Low2005 results across different:
 
 - Hardware configurations (CPU, RAM, storage)
 - Operating systems (macOS, Linux, Windows/WSL2)

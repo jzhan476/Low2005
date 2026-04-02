@@ -29,5 +29,5 @@ do "$latexmkroot/\@resources/latexmk/latexmkrc/latexmkrc_for-projects-with-circu
 do "$latexmkroot/\@resources/latexmk/latexmkrc/latexmkrc_env_variable_injection";
 
 # Load PDF viewer management (quit viewers before compilation)
-do "$latexmkroot/.latexmkrc_quit-pdf-viewers-on-latexmk_-c";
+do "$latexmkroot/\@resources/latexmk/latexmkrc/latexmkrc_quit-pdf-viewers-on-latexmk_-c";
 # DEBUGGED: 20250904-1813h PDF viewer management infrastructure completed - enhanced performance, cross-platform compatibility

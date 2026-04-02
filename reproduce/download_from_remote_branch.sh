@@ -9,6 +9,7 @@
 # ============================================================================
 
 # Configuration
+# Default upstream for optional large artifacts; override with GITHUB_REPO=
 GITHUB_REPO="${GITHUB_REPO:-llorracc/HAFiscal-QE}"
 PRECOMPUTED_BRANCH="${PRECOMPUTED_BRANCH:-with-precomputed-artifacts}"
 RAW_BASE_URL="https://raw.githubusercontent.com/${GITHUB_REPO}/${PRECOMPUTED_BRANCH}"

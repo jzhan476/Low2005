@@ -4,7 +4,7 @@
 set -e
 
 echo "========================================"
-echo "HAFiscal LaTeX Package Fix"
+echo "Low2005 LaTeX Package Fix"
 echo "========================================"
 echo ""
 
@@ -14,7 +14,7 @@ if command -v tlmgr >/dev/null 2>&1; then
     echo "✅ Found TeX Live: $TEXLIVE_BIN"
     echo ""
     
-    # List of commonly missing packages for HAFiscal
+    # List of commonly missing packages for this paper
     PACKAGES=(
         "moreverb"      # verbatimwrite environment
         "booktabs"      # Professional tables

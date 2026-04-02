@@ -134,7 +134,7 @@ fi
 
 # Header
 echo ""
-echo -e "${BOLD}HAFiscal Benchmark Results${RESET}"
+echo -e "${BOLD}Low2005 Benchmark Results${RESET}"
 if [[ "$MODE" != "all" ]]; then
     echo -e "${DIM}Filtering by mode: $MODE${RESET}"
 fi

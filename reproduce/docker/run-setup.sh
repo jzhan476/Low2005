@@ -28,10 +28,10 @@ fi
 
 # Fallback: try hardcoded paths (check both old and new locations)
 # Detect repo name from current directory or environment
-REPO_NAME=$(basename "$PWD" 2>/dev/null || echo "${REPO_NAME:-HAFiscal}")
+REPO_NAME=$(basename "$PWD" 2>/dev/null || echo "${REPO_NAME:-Low2005}")
 for SCRIPT_PATH in "/workspaces/${REPO_NAME}/reproduce/docker/setup.sh" \
-                   "/workspaces/HAFiscal-Public/reproduce/docker/setup.sh" \
-                   "/workspaces/HAFiscal-QE/reproduce/docker/setup.sh"; do
+                   "/workspaces/Low2005/reproduce/docker/setup.sh" \
+                   "/workspaces/jzhan476-Low2005/reproduce/docker/setup.sh"; do
     if [ -f "$SCRIPT_PATH" ]; then
         echo "✅ Using hardcoded path: $SCRIPT_PATH"
         cd "$(dirname "$(dirname "$(dirname "$SCRIPT_PATH")")")"

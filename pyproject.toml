@@ -1,17 +1,16 @@
-# HAFiscal is a research project, not an installable package
-# This pyproject.toml manages dependencies only (no build-system needed)
+# Dependency manifest for the Low2005 REMARK replication (not an installable package)
 
 [project]
-name = "hafiscal"
+name = "low2005"
 version = "1.0.0"
-description = "HAFiscal: Household Fiscal Policy Model"
+description = "Replication of Low (2005) with HARK (REMARK)"
 requires-python = ">=3.9,<3.10"
 authors = [
-    {name = "Christopher D. Carroll", email = "ccarroll@llorracc.org"},
+    {name = "Hamish W. Low"},
 ]
 readme = "README.md"
 license = {text = "Apache-2.0"}
-keywords = ["economics", "computational", "fiscal-policy", "heterogeneous-agents"]
+keywords = ["economics", "life-cycle", "labour-supply", "precautionary-saving", "HARK", "econ-ark"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
@@ -21,14 +20,10 @@ classifiers = [
 ]
 
 dependencies = [
-    # Economics packages
     "econ-ark==0.14.1",
-    "sequence-jacobian==1.0.0",
-    
-    # Core scientific computing stack
     "numpy>=1.24,<2",
     "scipy>=1.10",
-    "pandas>=2.0",  # Required for empirical data processing (make_liquid_wealth.py)
+    "pandas>=2.0",
     "matplotlib>=3.7",
     "numba>=0.57",
 ]
@@ -110,8 +105,7 @@ all = [
 # ============================================================================
 
 [tool.setuptools]
-# HAFiscal is a research project, not an installable package
-# Disable automatic package discovery to avoid setuptools errors
+# Not an installable package; disable discovery
 py-modules = []
 
 [tool.setuptools.packages.find]

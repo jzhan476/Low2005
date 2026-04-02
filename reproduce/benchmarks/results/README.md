@@ -118,7 +118,7 @@ Consider saving a benchmark to `saved/` if it represents:
 3. **Milestones** - Major version releases, optimizations
 4. **Regression testing** - Baseline performance for comparison
 5. **Cross-platform data** - macOS vs Linux, ARM vs x86
-6. **Documentation** - Examples for README/guides
+6. **Documentation** - Examples for project docs
 
 ## Example Workflow
 

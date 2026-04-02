@@ -1,5 +1,5 @@
 #!/bin/bash
-# HAFiscal TeX Environment Verification Script
+# Low2005 TeX Live verification
 # 
 # This script performs comprehensive checking of TeX installation
 # and provides clear guidance for resolving issues.
@@ -231,7 +231,7 @@ check_latex_packages() {
             return 0
         else
             log_error "Missing $missing_count packages ($missing_ratio% of checked packages)"
-            log_error "TeX installation may be too minimal for HAFiscal compilation"
+            log_error "TeX installation may be too minimal for Low2005 compilation"
             log_info "Consider installing a more complete TeX scheme:"
             log_info "  tlmgr install scheme-medium    # For most users"
             log_info "  tlmgr install scheme-full      # Complete installation"
@@ -330,7 +330,7 @@ show_installation_instructions() {
     if [[ "$os_type" = "Linux" ]] || [[ "$os_type" = "macOS" ]]; then
         echo
         echo "${BOLD}For Development Environments:${RESET}"
-        echo "  ${BLUE}Docker/Containers:${RESET} Use the HAFiscal devcontainer configuration"
+        echo "  ${BLUE}Docker/Containers:${RESET} See reproduce/docker/ if using containers"
         echo "  ${BLUE}CI/CD:${RESET} See .github/workflows/ for automated installation scripts"
     fi
 }
@@ -476,7 +476,7 @@ main() {
         return 0
     fi
     
-    echo "${BOLD}HAFiscal TeX Environment Verification${RESET}"
+    echo "${BOLD}Low2005 TeX Environment Verification${RESET}"
     echo
     log_info "Checking if basic LaTeX commands are available..."
     
@@ -526,7 +526,7 @@ main() {
     
     # Results and recommendations
     if [[ "$all_checks_passed" = true ]]; then
-        log_success "${BOLD}✅ TeX environment is ready for HAFiscal compilation!${RESET}"
+        log_success "${BOLD}✅ TeX environment is ready for Low2005 compilation!${RESET}"
         
         # Create timestamped marker file to skip future checks
         local timestamp=$(date '+%Y%m%d-%H%M')

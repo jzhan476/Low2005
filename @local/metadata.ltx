@@ -75,9 +75,9 @@
 
 % PDF metadata (for hyperref \hypersetup)
 \newcommand{\PDFTitle}{\TitleFull}
-\newcommand{\PDFAuthor}{Carroll, Crawley, Du, Frankovic, Tretvoll}
-\newcommand{\PDFSubject}{Fiscal stimulus policy comparison with heterogeneous agent models}
-\newcommand{\PDFKeywords}{stimulus checks, unemployment insurance extensions, payroll tax cuts, HANK/heterogeneous agent models, marginal propensity to consume, spending multipliers}
+\newcommand{\PDFAuthor}{Hamish W. Low}
+\newcommand{\PDFSubject}{Life-cycle labour supply, precautionary saving, incomplete markets (Low 2005)}
+\newcommand{\PDFKeywords}{precautionary saving, life-cycle labour supply, incomplete markets, self-insurance, heterogeneous agents}
 
 %% ==============================================================================
 %% SINGLE SOURCE OF TRUTH (SST) METADATA
@@ -86,20 +86,15 @@
 %% - econsocart (QE submission) - uses commands natively
 %% - econark (working paper) - uses econark-econsocart-compat.sty layer
 %%
-%% To use in HAFiscal.tex (econark):
-%%   \usepackage{econark-econsocart-compat}  % in preamble
-%%   \MetadataApply                           % after \begin{document}
-%%
-%% To use in HAFiscal-QE-template.tex (econsocart):
-%%   \MetadataApply                           % in preamble or after \begin{document}
+%% Optional: \MetadataApply (econsocart-style metadata) — not used by Low2005.tex as-is.
 %% ==============================================================================
  
 %% Pre-load abstract content to avoid \spacefactor errors from \input inside nested environments
-%% The abstract file is generated from HAFiscal-titlepage.tex (Single Source of Truth)
+%% The abstract file is generated from the main document (Single Source of Truth)
 %% Use \CatchFileDef to read file contents IMMEDIATELY into macro (not delayed via \input)
-%% Note: catchfile package must be loaded in preamble (done in HAFiscal-QE-template.tex)
-\IfFileExists{HAFiscal-Abstract.txt}{%
-  \CatchFileDef{\AbstractText}{HAFiscal-Abstract.txt}{}%
+%% catchfile is loaded via local-qe.sty when needed
+\IfFileExists{Low2005-Abstract.txt}{%
+  \CatchFileDef{\AbstractText}{Low2005-Abstract.txt}{}%
 }{%
   \newcommand{\AbstractText}{Abstract not available.}%
 }

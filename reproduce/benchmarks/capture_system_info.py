@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-System Information Capture for HAFiscal Benchmarking
+System information capture for Low2005 benchmarks
 
 Captures detailed system information following industry standards
 for reproducible benchmark reporting.

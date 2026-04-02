@@ -1,8 +1,8 @@
-# HAFiscal Benchmarking Guide
+# Low2005 benchmarking guide
 
 ## Overview
 
-The HAFiscal benchmarking system follows industry-standard practices for capturing and reporting reproduction run times across different hardware, operating systems, and configurations.
+This folder captures reproduction run times across different hardware and configurations.
 
 ## Quick Start
 
@@ -180,7 +180,7 @@ source .venv/bin/activate
 ./reproduce/benchmarks/benchmark.sh --docs --notes "UV environment"
 
 # With Conda
-conda activate hafiscal
+conda activate low2005
 ./reproduce/benchmarks/benchmark.sh --docs --notes "Conda environment"
 ```
 

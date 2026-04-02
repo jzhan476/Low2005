@@ -14,6 +14,19 @@ for (1..5) {
     $latexmkroot = dirname($latexmkroot);
 }
 
+# Ensure BibTeX and TeX can always find project-local class/style/bst/bib files,
+# even when users run latexmk directly from the repository root.
+my $old_texinputs = $ENV{'TEXINPUTS'} // '';
+my $old_bstinputs = $ENV{'BSTINPUTS'} // '';
+my $old_bibinputs = $ENV{'BIBINPUTS'} // '';
+
+$ENV{'TEXINPUTS'} =
+    ".:$latexmkroot//:$latexmkroot/\@resources/texlive/texmf-local/tex/latex//:$latexmkroot/\@local//:$old_texinputs";
+$ENV{'BSTINPUTS'} =
+    "$latexmkroot/\@resources/texlive/texmf-local/bibtex/bst//:$old_bstinputs";
+$ENV{'BIBINPUTS'} =
+    ".:$latexmkroot:$latexmkroot/\@resources/texlive/texmf-local/bibtex/bib//:$old_bibinputs";
+
 # Set PDF mode as default (use pdflatex, not latex/DVI)
 # This ensures all compilations produce PDF directly and can include PDF/PNG/JPG images
 $pdf_mode = 1;  # 1=pdflatex, 2=ps2pdf, 3=dvipdf, 4=lualatex, 5=xelatex
@@ -29,5 +42,5 @@ do "$latexmkroot/\@resources/latexmk/latexmkrc/latexmkrc_for-projects-with-circu
 do "$latexmkroot/\@resources/latexmk/latexmkrc/latexmkrc_env_variable_injection";
 
 # Load PDF viewer management (quit viewers before compilation)
-do "$latexmkroot/.latexmkrc_quit-pdf-viewers-on-latexmk_-c";
+do "$latexmkroot/\@resources/latexmk/latexmkrc/latexmkrc_quit-pdf-viewers-on-latexmk_-c";
 # DEBUGGED: 20250904-1813h PDF viewer management infrastructure completed - enhanced performance, cross-platform compatibility

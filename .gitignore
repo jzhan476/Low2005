@@ -359,8 +359,6 @@ ls-R
 
 # Avoid adding large data files to repo
 *.csv
-!Code/Empirical/rscfp2004.csv   # …except this one file
-!Code/Empirical/ccbal_answer.csv   # …except this one file
 
 *.dat
 make4ht-trials_private
@@ -513,10 +511,6 @@ Subfiles/@resources
 # Large compiled objects (added 2025-11-02)
 *.obj
 
-# Exception: Track precomputed .obj files needed for --comp min
-!Code/HA-Models/FromPandemicCode/HA_Fiscal_Jacs.obj
-!Code/HA-Models/FromPandemicCode/HA_Fiscal_Jacs_UI_extend_real.obj
-
 # Academic paper PDFs reference library (added 2025-11-02)
 resources-private/
 HAFiscal_variants/
@@ -540,8 +534,6 @@ Equations/*.tex
 # Stata data files (too large for GitHub)
 *.dta
 
-# Large SCF data file - download via download_scf_data.sh
-Code/Empirical/p04i6.dta
 .docker-initialized 
 .venv/
 # LaTeX-generated text files (but keep required_latex_packages.txt)

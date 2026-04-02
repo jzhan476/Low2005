@@ -1,5 +1,5 @@
 #!/bin/bash
-# HAFiscal LaTeX Document Reproduction Script
+# Low2005 LaTeX document reproduction
 # 
 # This script provides comprehensive document compilation following research reproduction best practices.
 # Consolidates functionality from multiple reproduction scripts into a single, maintainable solution.
@@ -17,11 +17,11 @@ DRY_RUN=false
 STOP_ON_ERROR="${STOP_ON_ERROR:-false}"
 SCOPE="main"
 DRAFT_MODE_ENABLED="false"
-REPO_TYPE="STANDARD"  # Will be set to "QE" if HAFiscal.tex exists
+REPO_TYPE="STANDARD"  # "QE" if a QE-style root .tex is detected
 
 show_help() {
     cat << 'EOF'
-HAFiscal LaTeX Document Reproduction Script
+Low2005 LaTeX Document Reproduction Script
 
 USAGE:
     ./reproduce_documents.sh [OPTIONS] [TARGETS...]
@@ -31,10 +31,8 @@ OPTIONS:
     --quick, -q             Quick compilation (single pass)
     --verbose, -v           Verbose output
     --clean, -c             Clean build artifacts before compilation
-    --draft                 Compile HAFiscal*.tex in draft mode
-                              - Latest/Public: Shows equation/figure/section labels
-                              - QE: Shows line numbers (output: HAFiscal-draft.pdf)
-                            Only applicable to HAFiscal.tex and HAFiscal.tex
+    --draft                 Draft mode for the root paper (labels / QE line numbers)
+                              - Output may be Low2005-draft.pdf or *-draft.pdf by jobname
                             Can also be controlled via DRAFT_MODE environment variable
     --single DOCUMENT       Compile only specified document
     --list                  List available documents
@@ -49,18 +47,17 @@ OPTIONS:
                             subfiles: root + Subfiles/
 
 TARGETS:
-    main                    HAFiscal.tex (main paper)
-    slides                  HAFiscal-Slides.tex
+    main                    Low2005.tex (main paper)
     appendix-hank          Subfiles/Appendix-HANK.tex
     appendix-nosplurge     Subfiles/Appendix-NoSplurge.tex
     all                    All documents (default)
 
 EXAMPLES:
     ./reproduce_documents.sh                    # Compile all documents
-    ./reproduce_documents.sh main slides       # Compile specific documents
-    ./reproduce_documents.sh --single HAFiscal.tex
+    ./reproduce_documents.sh main               # Compile main paper only
+    ./reproduce_documents.sh --single Low2005.tex
     ./reproduce_documents.sh --quick           # Fast compilation
-    ./reproduce_documents.sh --draft           # Compile HAFiscal*.tex in draft mode
+    ./reproduce_documents.sh --draft           # Draft mode for root .tex
     DRAFT_MODE=1 ./reproduce_documents.sh      # Draft mode via environment variable
 EOF
 }
@@ -142,8 +139,7 @@ cleanup_auxiliary_files() {
 # Function to resolve document target to file path
 resolve_document() {
     case "$1" in
-        "main") echo "HAFiscal.tex" ;;
-        "slides") echo "HAFiscal-Slides.tex" ;;
+        "main") echo "Low2005.tex" ;;
         "appendix-hank") echo "Subfiles/Appendix-HANK.tex" ;;
         "appendix-nosplurge") echo "Subfiles/Appendix-NoSplurge.tex" ;;
         *) echo "$1" ;;  # Return as-is for direct file paths
@@ -152,8 +148,7 @@ resolve_document() {
 
 list_documents() {
     echo "Available document targets:"
-    echo "  main -> HAFiscal.tex"
-    echo "  slides -> HAFiscal-Slides.tex"
+    echo "  main -> Low2005.tex"
     echo "  appendix-hank -> Subfiles/Appendix-HANK.tex"
     echo "  appendix-nosplurge -> Subfiles/Appendix-NoSplurge.tex"
 }
@@ -304,17 +299,15 @@ parse_latex_error() {
     printf "\n"
 }
 
-# Function to fetch HAFiscal.bib from with-precomputed-artifacts branch via HTTP
+# Function to fetch bibliography from with-precomputed-artifacts branch via HTTP (saved as Low2005.bib)
 fetch_bibliography_if_needed() {
-    # Check if HAFiscal.bib already exists - if so, don't fetch or track it
-    # This ensures we only clean up files we fetched, not pre-existing ones
-    if [[ -f "HAFiscal.bib" ]]; then
+    if [[ -f "Low2005.bib" ]] || [[ -f "HAFiscal.bib" ]]; then
         return 0
     fi
 
-    log_info "HAFiscal.bib not found in working directory"
+    log_info "Low2005.bib not found in working directory"
 
-    # Download from GitHub raw URL (avoids git fetch which bloats .git/objects/)
+    # Optional .bib fetch from upstream QE repo (path still HAFiscal.bib on that branch)
     GITHUB_REPO="${GITHUB_REPO:-llorracc/HAFiscal-QE}"
     PRECOMPUTED_BRANCH="${PRECOMPUTED_BRANCH:-with-precomputed-artifacts}"
     RAW_URL="https://raw.githubusercontent.com/${GITHUB_REPO}/${PRECOMPUTED_BRANCH}/HAFiscal.bib"
@@ -324,29 +317,29 @@ fetch_bibliography_if_needed() {
     echo "📦 Downloading Bibliography File"
     echo "========================================"
     echo ""
-    echo "HAFiscal.bib is required for citations but not present in main branch."
-    echo "Downloading from GitHub (${PRECOMPUTED_BRANCH} branch)..."
+    echo "Low2005.bib is required for citations but not present in main branch."
+    echo "Downloading from GitHub (${PRECOMPUTED_BRANCH} branch, upstream HAFiscal.bib)..."
     echo ""
 
-    echo "→ Downloading HAFiscal.bib..."
-    if curl -L --fail --silent --show-error -o HAFiscal.bib "$RAW_URL" 2>&1; then
-        if [[ -f "HAFiscal.bib" && -s "HAFiscal.bib" ]]; then
-            FILE_SIZE=$(du -h "HAFiscal.bib" 2>/dev/null | cut -f1)
-            echo "  ✓ HAFiscal.bib ($FILE_SIZE)"
+    echo "→ Downloading to Low2005.bib..."
+    if curl -L --fail --silent --show-error -o Low2005.bib "$RAW_URL" 2>&1; then
+        if [[ -f "Low2005.bib" && -s "Low2005.bib" ]]; then
+            FILE_SIZE=$(du -h "Low2005.bib" 2>/dev/null | cut -f1)
+            echo "  ✓ Low2005.bib ($FILE_SIZE)"
             echo ""
             echo "✅ Successfully downloaded bibliography"
             echo "   (This will be automatically cleaned up after document compilation)"
             echo ""
             FETCHED_BIBLIOGRAPHY=true
         else
-            log_error "HAFiscal.bib download failed or file is empty"
-            rm -f HAFiscal.bib 2>/dev/null || true
+            log_error "Low2005.bib download failed or file is empty"
+            rm -f Low2005.bib 2>/dev/null || true
         fi
     else
-        log_warning "Could not download HAFiscal.bib from GitHub"
+        log_warning "Could not download bibliography from GitHub"
         log_warning "URL: $RAW_URL"
         log_warning "Bibliography citations may not work correctly"
-        rm -f HAFiscal.bib 2>/dev/null || true
+        rm -f Low2005.bib 2>/dev/null || true
     fi
 
     return 0
@@ -388,8 +381,8 @@ validate_environment() {
             log_error "Tried PATH: $PATH"
             return 1
         fi
-        if [[ ! -f "HAFiscal.tex" ]]; then
-            log_error "HAFiscal.tex not found - run from project root directory"
+        if [[ ! -f "HAFiscal.tex" && ! -f "Low2005.tex" ]]; then
+            log_error "Low2005.tex or HAFiscal.tex not found - run from project root directory"
             return 1
         fi
         log_success "Environment validation completed (minimal checks)"
@@ -436,8 +429,8 @@ validate_environment() {
         return 1
     fi
     
-    if [[ ! -f "HAFiscal.tex" ]]; then
-        log_error "HAFiscal.tex not found - run from project root directory"
+    if [[ ! -f "HAFiscal.tex" && ! -f "Low2005.tex" ]]; then
+        log_error "Low2005.tex or HAFiscal.tex not found - run from project root directory"
         return 1
     fi
     
@@ -516,9 +509,9 @@ compile_document() {
     # Handle draft mode
     local current_draft_mode="$DRAFT_MODE_ENABLED"
     
-    # Validate: Only HAFiscal*.tex supports draft mode
-    if [[ "$current_draft_mode" == "true" ]] && [[ ! "$doc_name" =~ ^HAFiscal ]]; then
-        log_info "ℹ️  Draft mode only available for HAFiscal*.tex (not $doc_name), compiling normally"
+    # Validate: Only HAFiscal*.tex / Low2005.tex support draft mode
+    if [[ "$current_draft_mode" == "true" ]] && [[ ! "$doc_name" =~ ^HAFiscal ]] && [[ "$doc_name" != "Low2005" ]]; then
+        log_info "ℹ️  Draft mode only available for HAFiscal*.tex or Low2005.tex (not $doc_name), compiling normally"
         current_draft_mode="false"
     fi
     
@@ -532,7 +525,7 @@ compile_document() {
         else
             latexmk_opts+=("-usepretex=\\def\\OnlineAppendixHandling{${ONLINE_APPENDIX_HANDLING}}")
         fi
-    elif [[ "$REPO_TYPE" == "STANDARD" ]] && [[ "$doc_name" == "HAFiscal" ]]; then
+    elif [[ "$REPO_TYPE" == "STANDARD" ]] && [[ "$doc_name" == "HAFiscal" || "$doc_name" == "Low2005" ]]; then
         # Latest/Public repository: Use show-labels mechanism
         if [[ "${SHOW_LABELS:-}" == "true" ]] || [[ "$current_draft_mode" == "true" ]]; then
             log_info "📝 Compiling with labels visible"
@@ -845,7 +838,7 @@ main() {
     
     setup_build_environment
     
-    # Detect repository type for draft mode handling
+    # Detect repository type for draft mode handling (QE layout uses HAFiscal.tex)
     if [[ -f "HAFiscal.tex" ]]; then
         REPO_TYPE="QE"
         if [[ "$VERBOSE" == "true" ]]; then
@@ -854,11 +847,11 @@ main() {
     else
         REPO_TYPE="STANDARD"
         if [[ "$VERBOSE" == "true" ]]; then
-            log_info "Repository type: Latest/Public"
+            log_info "Repository type: Latest/Public (or Low2005-only tree)"
         fi
     fi
     
-    log_info "Starting HAFiscal document reproduction (mode: $REPRODUCTION_MODE)"
+    log_info "Starting Low2005 document reproduction (mode: $REPRODUCTION_MODE)"
     
     # Handle single document compilation
     if [[ -n "$single_document" ]]; then
@@ -1115,10 +1108,10 @@ main() {
     # FETCHED_BIBLIOGRAPHY is only true if the file was absent and we fetched it
     if [[ "$FETCHED_BIBLIOGRAPHY" == "true" ]]; then
         echo ""
-        echo "→ Cleaning up fetched HAFiscal.bib..."
-        if [[ -f "HAFiscal.bib" ]]; then
-            rm -f HAFiscal.bib
-            echo "  ✓ Removed HAFiscal.bib"
+        echo "→ Cleaning up fetched Low2005.bib..."
+        if [[ -f "Low2005.bib" ]]; then
+            rm -f Low2005.bib
+            echo "  ✓ Removed Low2005.bib"
         fi
         echo "✅ Cleanup complete - working tree is clean"
     fi

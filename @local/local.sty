@@ -1,7 +1,6 @@
-% HAFiscal local style file
-% For documentation on the HAFiscal project architecture, see @resources/
+% Project-local LaTeX configuration (Low2005 REMARK)
 
-\ProvidesPackage{local}[2025/11/06 HAFiscal local configuration]
+\ProvidesPackage{local}[2025/11/06 Low2005 local configuration]
 
 % INPUT PATH-TO-ROOT FIRST:
 % This defines \latexroot and \PathsToInputs macros
@@ -80,7 +79,7 @@
 % 3. Main document compiled first (to generate .aux file)
 
 \usepackage[econtex]{optional} % 'Optional' package loading system
-\renewcommand{\texname}{HAFiscal} % Keyname for paper (optional)
+\renewcommand{\texname}{Low2005} % Keyname for paper (optional)
 % Ensure cross-reference packages are available for standalone compilation
 \RequirePackage{xr-hyper}% For \externaldocument with hyperlinks
 \RequirePackage{amsmath}% For \eqref  
@@ -175,14 +174,10 @@
 \makeatother
 
 
-
-\ProvidesPackage{local}[2025/09/01 HAFiscal local style package]
-
 % REMOVED: econark-ifsubfile package - using entrypoint-based detection instead
 % \usepackage{@resources/texlive/texmf-local/tex/latex/econark-ifsubfile}
 
-% Define a few objects that are unique to the HAFiscal paper
-\input{@local/owner} % Owned by llorracc (draft) or econ-ark (published) ?
+\input{@local/owner}
 
 %% DEVELOPMENT-SPECIFIC PACKAGES (not needed for QE submission)
 % The following packages are used for the full HAFiscal development system
@@ -278,7 +273,7 @@
   % ─────────────────────────────────────────────────────────────────────────
   % Use full bibliography detection that searches for:
   %   - \texname-Add-Refs.bib (additional manual references)
-  %   - \texname.bib (main bibliography, e.g., HAFiscal.bib)
+  %   - \texname.bib (main bibliography, e.g., Low2005.bib)
   %   - system.bib (global reference database)
   % The \bibfilesfind command checks each file for existence and content.
   \bibfilesfind{\texname}%
@@ -294,7 +289,7 @@
 \usepackage{pdforhtml}                 % Originally from HAFiscal.tex - allow compile as pdf or html (development only)
 
 % Presentation and development-specific packages
-% \usepackage{econark}                   % Originally from HAFiscal-Slides.tex - econark LaTeX package (development only)
+% \usepackage{econark}                   % econark LaTeX package (development only)
 % NOTE: Commented out - HAFiscal.tex uses \documentclass{econark}, so \usepackage{econark} is not needed
 % and econark.sty file appears to be broken (contains only a path string, not LaTeX code)
 % CONDITIONAL SUBFIGURE PACKAGE - VERIFIED COMPATIBLE WITH BOTH CLASSES

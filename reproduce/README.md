@@ -1,18 +1,15 @@
-# HAFiscal Reproduction Scripts Directory
+# Low2005 Reproduction Scripts
 
-This directory contains all scripts needed to reproduce the HAFiscal paper's computational results and LaTeX documents. The scripts are organized by function and designed to work together as part of the main `reproduce.sh` workflow.
+Scripts for building `Low2005.pdf` and running the HARK replication (`Code/Python/Low2005.py`) via `reproduce.sh`.
 
 ## 📋 Quick Reference
 
-Most users should use the main reproduction script in the parent directory:
-
 ```bash
-../reproduce.sh --docs main     # Build main document
-../reproduce.sh --comp min      # Run minimal computations
-../reproduce.sh --comp full     # Run full computations
-../reproduce.sh --comp max      # Run full computations + robustness results
+../reproduce.sh --docs main     # Build Low2005.tex → Low2005.pdf
+../reproduce.sh --comp min      # Run Code/Python/Low2005.py
+../reproduce.sh --comp full     # Same as min (legacy name)
 ../reproduce.sh --envt texlive  # Test LaTeX environment
-../reproduce.sh --envt comp_uv  # Test computational environment
+../reproduce.sh --envt comp_uv  # Test Python/UV environment
 ```
 
 The scripts in this directory are typically called by `reproduce.sh` or `reproduce.py`, but can also be used directly for specific tasks.
@@ -71,12 +68,11 @@ The scripts in this directory are typically called by `reproduce.sh` or `reprodu
 - Sets up proper `BIBINPUTS` and `BSTINPUTS` environment variables
 - Compiles specified LaTeX documents using `latexmk`
 - Handles both main document and subfiles
-- Supports different document variants (main, slides, appendices)
+- Supports different document variants (main, appendices)
 
 **Arguments:**
 
-- `main` - Compile HAFiscal.tex (main document)
-- `slides` - Compile HAFiscal-Slides.tex
+- `main` - Compile Low2005.tex (main document)
 - `subfiles` - Compile individual subfiles
 - `all` - Compile everything
 
@@ -84,7 +80,6 @@ The scripts in this directory are typically called by `reproduce.sh` or `reprodu
 
 ```bash
 ./reproduce/reproduce_documents.sh main
-./reproduce/reproduce_documents.sh slides
 ```
 
 ### `reproduce-standalone-files.sh`
@@ -108,83 +103,16 @@ The scripts in this directory are typically called by `reproduce.sh` or `reprodu
 
 ---
 
-## 📊 Empirical Data Reproduction Scripts
-
-### `reproduce_data_moments.sh`
-**Purpose:** Calculate empirical data moments from SCF 2004  
-**When to use:** Called by `reproduce.sh --data` or run directly  
-**What it does:**
-
-- Downloads SCF 2004 data if needed (via `download_scf_data.sh`)
-- Runs Python analysis (`Code/Empirical/make_liquid_wealth.py`)
-- Calculates population, income, wealth distribution statistics
-- Generates Lorenz curve data used in Figure 2
-
-**Usage:**
-
-```bash
-./reproduce/reproduce_data_moments.sh
-```
-
----
-
-## 🧮 Computational Reproduction Scripts
-
-### `reproduce_computed.sh`
-**Purpose:** Run full computational pipeline to generate all results  
-**When to use:** Called by `reproduce.sh --comp full` or `--comp max`  
-**What it does:**
-
-- Activates Python environment
-- Runs `Code/HA-Models/do_all.py` to execute computational steps
-- Respects `HAFISCAL_RUN_STEP_3` environment variable for robustness results
-- Generates figures and tables used in the paper
-
-**Usage:**
-
-```bash
-./reproduce/reproduce_computed.sh              # Standard full run
-HAFISCAL_RUN_STEP_3=true ./reproduce/reproduce_computed.sh  # Include robustness
-```
+## 🧮 Computational reproduction
 
 ### `reproduce_computed_min.sh`
-**Purpose:** Run minimal computational reproduction using pre-generated results  
-**When to use:** Called by `reproduce.sh --comp min` for quick testing  
-**What it does:**
+Runs `Code/Python/Low2005.py` (from `Code/Python/`), creates `Figures/*.png`, and ensures `Figures/` exists.
 
-- Checks for required `.obj` files from previous full run
-- Temporarily renames existing table files
-- Runs minimal computations (figures from existing .obj files)
-- Restores original table files
-- Much faster than full computation (~5 min vs ~2-3 hours)
+### `reproduce_computed.sh`
+Calls `reproduce_computed_min.sh`, then removes `reproduce/.results_pregenerated` if present.
 
-**Prerequisites:** Must have run `--comp full` at least once to generate `.obj` files
-
-**Usage:**
-
-```bash
-./reproduce/reproduce_computed_min.sh
-```
-
----
-
-## 🛠️ Utility Scripts
-
-### `stash-tables-during-comp-min-run.py`
-**Purpose:** Manage table files during minimal computational runs  
-**When to use:** Called automatically by `reproduce_computed_min.sh`  
-**What it does:**
-
-- Temporarily renames `.tex` files in `Tables/` directory
-- Prevents overwriting of full computation results
-- Restores files after minimal run completes
-
-**Usage:**
-
-```bash
-python stash-tables-during-comp-min-run.py stash    # Rename files
-python stash-tables-during-comp-min-run.py restore  # Restore original names
-```
+### `reproduce_figures_from_results.sh`
+Legacy no-op: Low2005 figures are produced by `Low2005.py`, not from pre-built HA-Model results.
 
 ---
 
@@ -245,15 +173,10 @@ These are not used in current workflows.
 ### First-Time Setup
 
 ```bash
-# 1. Set up computational environment
 ./reproduce/reproduce_environment_comp_uv.sh
-
-# 2. Verify environments
 ../reproduce.sh --envt texlive
 ../reproduce.sh --envt comp_uv
-
-# 3. Run full reproduction
-../reproduce.sh --comp full
+../reproduce.sh --comp min
 ../reproduce.sh --docs main
 ```
 
@@ -264,28 +187,17 @@ These are not used in current workflows.
 ../reproduce.sh --docs main
 ```
 
-### Empirical Data Moments
-
-```bash
-# Calculate SCF 2004 data moments (~1 minute + download time)
-../reproduce.sh --data
-```
-
 ### Testing After Code Changes
 
 ```bash
-# Quick computational test with existing .obj files
 ../reproduce.sh --comp min
 ../reproduce.sh --docs main
 ```
 
-### Full Reproduction for Publication
+### Full workflow
 
 ```bash
-# Complete reproduction from scratch
-../reproduce.sh --data         # Empirical moments (~1 min)
-../reproduce.sh --comp full    # ~2-3 hours
-../reproduce.sh --comp max     # +robustness results (~4-6 hours)
+../reproduce.sh --comp min
 ../reproduce.sh --docs main
 ```
 
@@ -294,13 +206,8 @@ These are not used in current workflows.
 ## 🔗 Related Documentation
 
 - **Main README:** [`../README.md`](../README.md) - Project overview and quick start
-- **QE Replication:** [`../README-QE.md`](../README-QE.md) - Instructions for replicators
-- **Troubleshooting:** [`../README/TROUBLESHOOTING.md`](../README/TROUBLESHOOTING.md) - Common issues
-- **Quick Reference:** [`../README/QUICK-REFERENCE.md`](../README/QUICK-REFERENCE.md) - Command reference
-- **Installation:** [`../README/INSTALLATION.md`](../README/INSTALLATION.md) - Platform-specific setup
-- **Contributing:** [`../README/CONTRIBUTING.md`](../README/CONTRIBUTING.md) - Contribution guidelines
+- **REMARK:** [`../REMARK.md`](../REMARK.md) - Replication notes
 - **Benchmarking:** [`benchmarks/README.md`](benchmarks/README.md) - Performance testing
-- **Container Architecture:** [`../README_IF_YOU_ARE_AN_AI/CONTAINER_ARCHITECTURE.md`](../README_IF_YOU_ARE_AN_AI/CONTAINER_ARCHITECTURE.md) - System design
 
 ---
 
@@ -308,7 +215,7 @@ These are not used in current workflows.
 
 1. **Always use `reproduce.sh`** in the parent directory rather than calling these scripts directly, unless you know what you're doing
 2. **Check verification markers** - If environment setup scripts have already created recent `.verified` files, you may not need to run them again
-3. **Use `--comp min` for testing** - Much faster than full computation when you only need to verify the build process
+3. **Computational reproduction** - Requires `Code/HA-Models/` (restore from git if removed in a minimal checkout)
 4. **Check benchmarks/** for performance data from previous runs
 5. **Read script headers** - Each script has detailed comments explaining its purpose and usage
 

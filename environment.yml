@@ -10,12 +10,12 @@
 # See README.md for migration instructions.
 # =============================================================================
 
-# Conda environment for HAFiscal project
+# Conda environment for Low2005 (optional; UV is preferred)
 # Create environment: conda env create -f environment.yml
 # Update environment: conda env update -f environment.yml --prune
-# Activate: conda activate hafiscal
+# Activate: conda activate low2005
 
-name: hafiscal
+name: low2005
 channels:
   - conda-forge
   - defaults

@@ -1,5 +1,5 @@
 #!/bin/bash
-# HAFiscal Environment Setup Wrapper
+# Low2005 environment setup wrapper
 # This script delegates to reproduce_environment_comp_uv.sh (SST for UV setup)
 # and only falls back to conda if UV setup fails or is unavailable
 
@@ -43,7 +43,7 @@ echo "   To install UV:"
 echo "     curl -LsSf https://astral.sh/uv/install.sh | sh"
 echo ""
 
-ENV_NAME="HAFiscal"
+ENV_NAME="low2005"
 ENV_FILE="$PROJECT_ROOT/binder/environment.yml"
 
 # Check if conda is available

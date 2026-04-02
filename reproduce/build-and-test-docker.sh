@@ -23,11 +23,10 @@ REPO_ROOT="$(pwd)"
 
 # Detect repository name and set image details
 REPO_NAME=$(basename "$REPO_ROOT" | tr '[:upper:]' '[:lower:]')
-REPO_SUFFIX=${REPO_NAME#hafiscal-}
 
-# Docker image details
-DOCKER_USER="llorracc"
-DOCKER_IMAGE_NAME="hafiscal-${REPO_SUFFIX}"
+# Docker image details (override with env)
+DOCKER_USER="${DOCKER_USER:-jzhan476}"
+DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-${REPO_NAME}-repro}"
 DOCKER_IMAGE_TAG="latest"
 DOCKER_IMAGE="${DOCKER_USER}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
 DOCKER_CONTAINER="test-${DOCKER_IMAGE_NAME}-$$"
@@ -237,9 +236,9 @@ VENV_VAR=$(docker exec "$DOCKER_CONTAINER" bash -c 'echo $VIRTUAL_ENV' 2>&1)
 echo "{\"location\":\"build-and-test-docker.sh:227\",\"message\":\"Python venv check\",\"data\":{\"hypothesis\":\"C\",\"python_path\":\"$PYTHON_PATH\",\"version\":\"$PYTHON_VERSION\",\"virtual_env\":\"$VENV_VAR\"},\"timestamp\":$(date +%s)000,\"sessionId\":\"debug-session\"}" >> "$DEBUG_LOG"
 
 # Hypothesis D: Check critical files exist
-TEX_EXISTS=$(docker exec "$DOCKER_CONTAINER" bash -c 'test -f /workspace/HAFiscal.tex && echo "EXISTS" || echo "MISSING"' 2>&1)
-BIB_EXISTS=$(docker exec "$DOCKER_CONTAINER" bash -c 'test -f /workspace/HAFiscal.bib && echo "EXISTS" || echo "MISSING"' 2>&1)
-echo "{\"location\":\"build-and-test-docker.sh:233\",\"message\":\"Critical files check\",\"data\":{\"hypothesis\":\"D\",\"hafiscal_tex\":\"$TEX_EXISTS\",\"hafiscal_bib\":\"$BIB_EXISTS\"},\"timestamp\":$(date +%s)000,\"sessionId\":\"debug-session\"}" >> "$DEBUG_LOG"
+TEX_EXISTS=$(docker exec "$DOCKER_CONTAINER" bash -c 'test -f /workspace/Low2005.tex && echo "EXISTS" || echo "MISSING"' 2>&1)
+BIB_EXISTS=$(docker exec "$DOCKER_CONTAINER" bash -c 'test -f /workspace/Low2005.bib && echo "EXISTS" || echo "MISSING"' 2>&1)
+echo "{\"location\":\"build-and-test-docker.sh:233\",\"message\":\"Critical files check\",\"data\":{\"hypothesis\":\"D\",\"tex\":\"$TEX_EXISTS\",\"bib\":\"$BIB_EXISTS\"},\"timestamp\":$(date +%s)000,\"sessionId\":\"debug-session\"}" >> "$DEBUG_LOG"
 
 # Hypothesis E: Check write permissions
 WORKSPACE_PERMS=$(docker exec "$DOCKER_CONTAINER" bash -c 'ls -ld /workspace' 2>&1)
@@ -262,11 +261,11 @@ if docker exec "$DOCKER_CONTAINER" bash -c "source /home/vscode/.bashrc 2>/dev/n
     log_success "reproduce.sh --docs completed successfully"
     
     # Check if PDF was generated
-    if docker exec "$DOCKER_CONTAINER" test -f /workspace/HAFiscal.pdf; then
-        PDF_SIZE=$(docker exec "$DOCKER_CONTAINER" ls -lh /workspace/HAFiscal.pdf | awk '{print $5}')
-        log_success "HAFiscal.pdf generated ($PDF_SIZE)"
+    if docker exec "$DOCKER_CONTAINER" test -f /workspace/Low2005.pdf; then
+        PDF_SIZE=$(docker exec "$DOCKER_CONTAINER" ls -lh /workspace/Low2005.pdf | awk '{print $5}')
+        log_success "Low2005.pdf generated ($PDF_SIZE)"
     else
-        log_warning "reproduce.sh succeeded but HAFiscal.pdf not found"
+        log_warning "reproduce.sh succeeded but Low2005.pdf not found"
     fi
 else
     log_error "reproduce.sh --docs failed in container"

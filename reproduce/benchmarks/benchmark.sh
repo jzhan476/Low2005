@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# HAFiscal Reproduction Benchmarking Wrapper
+# Low2005 reproduction benchmarking wrapper
 #
 # This script wraps the reproduce.sh script to capture detailed timing
 # and system information for benchmarking purposes.
@@ -66,7 +66,7 @@ elif [[ " ${REPRODUCE_ARGS[*]} " =~ " --all " ]] || [[ " ${REPRODUCE_ARGS[*]} " 
 fi
 
 echo "========================================"
-echo "HAFiscal Reproduction Benchmark"
+echo "Low2005 Reproduction Benchmark"
 echo "========================================"
 echo ""
 echo "Benchmark ID: $BENCHMARK_ID"
@@ -79,7 +79,7 @@ echo ""
 echo "Capturing system information..."
 
 # Capture system info
-python3 "$CAPTURE_SCRIPT" --output /tmp/hafiscal_sysinfo_$$.json --pretty
+python3 "$CAPTURE_SCRIPT" --output /tmp/low2005_sysinfo_$$.json --pretty
 
 echo "Starting reproduction..."
 echo "========================================"
@@ -115,7 +115,7 @@ echo ""
 echo "Generating benchmark report..."
 
 # Read system info
-SYSTEM_INFO=$(cat /tmp/hafiscal_sysinfo_$$.json)
+SYSTEM_INFO=$(cat /tmp/low2005_sysinfo_$$.json)
 
 # Get username
 USER_NAME="${USER:-unknown}"
@@ -142,7 +142,7 @@ $(echo "$SYSTEM_INFO" | sed 's/^/  /' | sed '1d; $d'),
 EOF
 
 # Clean up temp file
-rm -f /tmp/hafiscal_sysinfo_$$.json
+rm -f /tmp/low2005_sysinfo_$$.json
 
 echo "✅ Benchmark report saved: $OUTPUT_FILE"
 echo ""

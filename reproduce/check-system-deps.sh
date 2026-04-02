@@ -1,5 +1,5 @@
 #!/bin/bash
-# Check and verify system dependencies for HAFiscal
+# Check system dependencies for Low2005 reproduction
 # System tools cannot be installed via uv/pip - they must be installed separately
 #
 # Usage: ./check-system-deps.sh [--install]
@@ -13,7 +13,7 @@ if [[ "$1" == "--install" ]]; then
 fi
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🔍 HAFiscal System Dependencies Check"
+echo "🔍 Low2005 System Dependencies Check"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "Note: These are system-level tools (not Python packages)"

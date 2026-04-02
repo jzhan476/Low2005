@@ -36,14 +36,12 @@
 # ============================================================================
 # Rationale: Committed to Git for distribution but shouldn't be indexed
 # - Binary files (not searchable)
-# - Large (HAFiscal.pdf = 1.0M, HAFiscal-Slides.pdf = 533K)
+# - Large (Low2005.pdf)
 # - Frequently regenerated (forces re-indexing)
 *.pdf
-HAFiscal.pdf
-HAFiscal-Slides.pdf
+Low2005.pdf
 Figures/
 Tables/
-Subfiles/*.pdf
 
 # ============================================================================
 # Historical/Archive Directories (27 markdown files)
@@ -117,7 +115,7 @@ private-dev/
 # Large Data Files
 # ============================================================================
 # Rationale: Large data files that slow indexing
-# Note: Some may be committed to Git (e.g., Code/Empirical/*.csv exceptions)
+# Large/generated artifacts may be unignored selectively per-project.
 *.dta
 *.pkl
 *.pickle

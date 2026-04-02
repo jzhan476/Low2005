@@ -1,37 +1,41 @@
-# This CITATION.cff file was generated with cffinit.
-# Visit https://bit.ly/cffinit to generate yours today!
-
 cff-version: 1.2.0
 title: >-
-  Welfare and Spending Effects of Consumption Stimulus
-  Policies
+  Low (2005) replication: Self-Insurance in a Life-Cycle Model of Labour Supply and Savings
 message: >-
-  If you use this software, please cite it using the
-  metadata from this file.
+  If you use this replication software, please cite it using the metadata below.
+  The academic paper to cite is Low (2005), *Review of Economic Dynamics*.
 type: software
-version: 1.0.7
+version: 1.0.0
 authors:
-  - given-names: Christopher D.
-    family-names: Carroll
-    orcid: 'https://orcid.org/0000-0003-3732-9312'
-  - given-names: Edmund
-    family-names: Crawley
-  - given-names: William
-    family-names: Du
-  - given-names: Ivan
-    family-names: Frankovic
-  - given-names: Hakon
-    family-names: Tretvoll
-repository-code: 'https://github.com/econ-ark/HAFiscal'
-doi: 10.5281/zenodo.17861977
+  - family-names: Low
+    given-names: Hamish W.
+    affiliation: University of Cambridge
+repository-code: 'https://github.com/jzhan476/Low2005'
+license: Apache-2.0
 keywords:
-  - stimulus checks
-  - unemployment insurance extensions
-  - payroll tax cuts
-  - HANK
-  - heterogeneous agent models
-  - marginal propensity to consume
-  - spending multipliers
-  - fiscal policy
+  - life-cycle model
+  - labour supply
+  - precautionary saving
+  - incomplete markets
+  - self-insurance
+  - heterogeneous agents
+  - HARK
   - REMARK
-  - Reproduction
+  - reproduction
+identifiers:
+  - type: doi
+    description: Zenodo archive (replication package)
+    value: 10.5281/zenodo.17861977
+preferred-citation:
+  type: article
+  title: Self-Insurance in a Life-Cycle Model of Labour Supply and Savings
+  authors:
+    - family-names: Low
+      given-names: Hamish W.
+  year: 2005
+  journal: Review of Economic Dynamics
+  volume: 8
+  issue: 4
+  start: 945
+  end: 975
+  doi: 10.1016/j.red.2005.03.002

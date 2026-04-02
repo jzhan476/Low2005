@@ -2,7 +2,7 @@
 
 ## What We've Implemented
 
-A comprehensive benchmarking system following industry standards (pytest-benchmark, GitHub Actions benchmark format) to track HAFiscal reproduction performance.
+A benchmarking helper to track Low2005 reproduction run times (local JSON under `results/`).
 
 ## Files Created
 

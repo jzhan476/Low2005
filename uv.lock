@@ -480,108 +480,6 @@ wheels = [
 ]
 
 [[package]]
-name = "hafiscal"
-version = "1.0.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "econ-ark" },
-    { name = "matplotlib" },
-    { name = "numba" },
-    { name = "numpy" },
-    { name = "pandas" },
-    { name = "scipy" },
-    { name = "sequence-jacobian" },
-]
-
-[package.dev-dependencies]
-all = [
-    { name = "black" },
-    { name = "ipykernel" },
-    { name = "ipynb-py-convert" },
-    { name = "ipywidgets" },
-    { name = "jupyter" },
-    { name = "mypy" },
-    { name = "notebook" },
-    { name = "pdfx" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "ruff" },
-    { name = "seaborn" },
-    { name = "statsmodels" },
-    { name = "voila" },
-]
-analysis = [
-    { name = "seaborn" },
-    { name = "statsmodels" },
-]
-dev = [
-    { name = "black" },
-    { name = "mypy" },
-    { name = "pdfx" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "ruff" },
-]
-jupyter = [
-    { name = "ipykernel" },
-    { name = "ipynb-py-convert" },
-    { name = "ipywidgets" },
-    { name = "jupyter" },
-    { name = "notebook" },
-    { name = "voila" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "econ-ark", specifier = "==0.14.1" },
-    { name = "matplotlib", specifier = ">=3.7" },
-    { name = "numba", specifier = ">=0.57" },
-    { name = "numpy", specifier = ">=1.24,<2" },
-    { name = "pandas", specifier = ">=2.0" },
-    { name = "scipy", specifier = ">=1.10" },
-    { name = "sequence-jacobian", specifier = "==1.0.0" },
-]
-
-[package.metadata.requires-dev]
-all = [
-    { name = "black", specifier = ">=23.0" },
-    { name = "ipykernel", specifier = ">=6.0" },
-    { name = "ipynb-py-convert", specifier = ">=0.4" },
-    { name = "ipywidgets", specifier = ">=8.0" },
-    { name = "jupyter", specifier = ">=1.0" },
-    { name = "mypy", specifier = ">=1.0" },
-    { name = "notebook", specifier = ">=7.0" },
-    { name = "pdfx", specifier = ">=1.4.1" },
-    { name = "pytest", specifier = ">=7.0" },
-    { name = "pytest-cov", specifier = ">=4.0" },
-    { name = "ruff", specifier = ">=0.1.0" },
-    { name = "seaborn", specifier = ">=0.12" },
-    { name = "statsmodels", specifier = ">=0.14" },
-    { name = "voila", specifier = ">=0.5.6" },
-]
-analysis = [
-    { name = "seaborn", specifier = ">=0.12" },
-    { name = "statsmodels", specifier = ">=0.14" },
-]
-dev = [
-    { name = "black", specifier = ">=23.0" },
-    { name = "mypy", specifier = ">=1.0" },
-    { name = "pdfx", specifier = ">=1.4.1" },
-    { name = "pytest", specifier = ">=7.0" },
-    { name = "pytest-cov", specifier = ">=4.0" },
-    { name = "ruff", specifier = ">=0.1.0" },
-]
-jupyter = [
-    { name = "ipykernel", specifier = ">=6.0" },
-    { name = "ipynb-py-convert", specifier = ">=0.4" },
-    { name = "ipywidgets", specifier = ">=8.0" },
-    { name = "jupyter", specifier = ">=1.0" },
-    { name = "notebook", specifier = ">=7.0" },
-    { name = "voila", specifier = ">=0.5.6" },
-]
-qe = []
-
-[[package]]
 name = "httpcore"
 version = "1.0.9"
 source = { registry = "https://pypi.org/simple" }
@@ -1094,6 +992,106 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/07/73/0aef09cf017a4f8b9c0eb371d273e7bb3e514992c4f1d8ed09e8f81f4602/llvmlite-0.41.1-cp39-cp39-win32.whl", hash = "sha256:880cb57ca49e862e1cd077104375b9d1dfdc0622596dfa22105f470d7bacb309", size = 23414330, upload-time = "2023-10-18T13:36:13.771Z" },
     { url = "https://files.pythonhosted.org/packages/88/99/aa829162a871f0f91dba9a0344726449cafbff4e9e55d7a714051cbb6215/llvmlite-0.41.1-cp39-cp39-win_amd64.whl", hash = "sha256:92f093986ab92e71c9ffe334c002f96defc7986efda18397d0f08534f3ebdc4d", size = 28092675, upload-time = "2023-10-18T13:36:17.19Z" },
 ]
+
+[[package]]
+name = "low2005"
+version = "1.0.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "econ-ark" },
+    { name = "matplotlib" },
+    { name = "numba" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "scipy" },
+]
+
+[package.dev-dependencies]
+all = [
+    { name = "black" },
+    { name = "ipykernel" },
+    { name = "ipynb-py-convert" },
+    { name = "ipywidgets" },
+    { name = "jupyter" },
+    { name = "mypy" },
+    { name = "notebook" },
+    { name = "pdfx" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
+    { name = "seaborn" },
+    { name = "statsmodels" },
+    { name = "voila" },
+]
+analysis = [
+    { name = "seaborn" },
+    { name = "statsmodels" },
+]
+dev = [
+    { name = "black" },
+    { name = "mypy" },
+    { name = "pdfx" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
+]
+jupyter = [
+    { name = "ipykernel" },
+    { name = "ipynb-py-convert" },
+    { name = "ipywidgets" },
+    { name = "jupyter" },
+    { name = "notebook" },
+    { name = "voila" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "econ-ark", specifier = "==0.14.1" },
+    { name = "matplotlib", specifier = ">=3.7" },
+    { name = "numba", specifier = ">=0.57" },
+    { name = "numpy", specifier = ">=1.24,<2" },
+    { name = "pandas", specifier = ">=2.0" },
+    { name = "scipy", specifier = ">=1.10" },
+]
+
+[package.metadata.requires-dev]
+all = [
+    { name = "black", specifier = ">=23.0" },
+    { name = "ipykernel", specifier = ">=6.0" },
+    { name = "ipynb-py-convert", specifier = ">=0.4" },
+    { name = "ipywidgets", specifier = ">=8.0" },
+    { name = "jupyter", specifier = ">=1.0" },
+    { name = "mypy", specifier = ">=1.0" },
+    { name = "notebook", specifier = ">=7.0" },
+    { name = "pdfx", specifier = ">=1.4.1" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "pytest-cov", specifier = ">=4.0" },
+    { name = "ruff", specifier = ">=0.1.0" },
+    { name = "seaborn", specifier = ">=0.12" },
+    { name = "statsmodels", specifier = ">=0.14" },
+    { name = "voila", specifier = ">=0.5.6" },
+]
+analysis = [
+    { name = "seaborn", specifier = ">=0.12" },
+    { name = "statsmodels", specifier = ">=0.14" },
+]
+dev = [
+    { name = "black", specifier = ">=23.0" },
+    { name = "mypy", specifier = ">=1.0" },
+    { name = "pdfx", specifier = ">=1.4.1" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "pytest-cov", specifier = ">=4.0" },
+    { name = "ruff", specifier = ">=0.1.0" },
+]
+jupyter = [
+    { name = "ipykernel", specifier = ">=6.0" },
+    { name = "ipynb-py-convert", specifier = ">=0.4" },
+    { name = "ipywidgets", specifier = ">=8.0" },
+    { name = "jupyter", specifier = ">=1.0" },
+    { name = "notebook", specifier = ">=7.0" },
+    { name = "voila", specifier = ">=0.5.6" },
+]
+qe = []
 
 [[package]]
 name = "markupsafe"
@@ -1904,15 +1902,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/fd/3a/aec9b02217bb79b87bbc1a21bc6abc51e3d5dcf65c30487ac96c0908c722/Send2Trash-1.8.3.tar.gz", hash = "sha256:b18e7a3966d99871aefeb00cfbcfdced55ce4871194810fc71f4aa484b953abf", size = 17394, upload-time = "2024-04-07T00:01:09.267Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/40/b0/4562db6223154aa4e22f939003cb92514c79f3d4dccca3444253fd17f902/Send2Trash-1.8.3-py3-none-any.whl", hash = "sha256:0c31227e0bd08961c7665474a3d1ef7193929fedda4233843689baa056be46c9", size = 18072, upload-time = "2024-04-07T00:01:07.438Z" },
-]
-
-[[package]]
-name = "sequence-jacobian"
-version = "1.0.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/96/77/0a1b6888f7534951d6c147e4243e1a610f9f2c6189c2f2eae3ee44a4d479/sequence-jacobian-1.0.0.tar.gz", hash = "sha256:28a18025b16ed94fcdde2fcbc1432c8761ea22b30b899f681b85c58b14730e6a", size = 74446, upload-time = "2022-01-10T19:01:55.959Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/1f/61/f1a34de4df9f3d062a88b15e8eec278aaf246340ce71f622a98716af71d3/sequence_jacobian-1.0.0-py3-none-any.whl", hash = "sha256:40715634f6fcf8f695d79687c471bedcecacdeff94522557f5186b630f46ef01", size = 90281, upload-time = "2022-01-10T19:01:54.806Z" },
 ]
 
 [[package]]
