@@ -7,7 +7,7 @@
 \usepackage{local}                % Local package definitions and setup
 \usepackage{local-qe}             % local-qe gets pkgs req for qe
 
-\bibliographystyle{econark}       % based on econometrica
+\bibliographystyle{plainnat}
 
 % Load metadata BEFORE hypersetup (SST pattern)
 \input{\latexroot/@local/metadata.ltx}
@@ -37,15 +37,15 @@
   \newcommand{\versn}{Web}
 }
 
-\title{Low (2005): Self-Insurance in a Life-Cycle Model of Labour Supply and Savings}
+\title{A Replication of Low (2005): Self-Insurance in a Life-Cycle Model of Labour Supply and Savings}
 
-\author{Hamish W. Low}
+\author{REMARK Replication Package}
 
 \keywords{Precautionary saving; Life-cycle labour supply}
 
 \jelclass{D91; H31}
 
-\date{\today}
+\date{}
 
 \maketitle
 \vspace{-0.5\baselineskip}
@@ -56,6 +56,12 @@
 \end{abstract}
 \vspace{-0.5\baselineskip}
 
+This document is a REMARK-style replication note for Low (2005). As in projects such as
+\texttt{Aiyagari-Idiosyncratic} and \texttt{BufferStock-LifeCycle}, the goal is to pair a
+concise paper summary with executable code that reproduces the main quantitative
+comparisons. In this repository, the computational replication is implemented in
+\path{Code/Python/Low2005.py}.
+
 \whenintegrated{\label{links}} % integrated doc: SST for labels
 
 \providecommand{\REMARK}{\href{https://github.com/econ-ark/REMARK}{REMARK}}
@@ -65,27 +71,20 @@
     \begin{tabbing}
       \texttt{~~~~~~~~~~~~~~~~~~~~~~~} \= \=  \\
       \texttt{~~~~GitHub~Repo:~~~~~~~} \> \> \texttt{\href{https://github.com/\owner/\projectname}{https://github.com/\owner/\projectname}} \\
-      \texttt{~~~~~~~~~~~~~~~~~~PDF:~} \> \> \texttt{\href{https://github.com/\owner/\projectname/blob/main/Low2005.pdf}{Low2005.pdf}} \\
+      \texttt{~~~~~~~~~~~~~~~~~~PDF:~} \> \> \texttt{\href{https://github.com/\owner/\projectname/blob/main/build/Low2005.pdf}{build/Low2005.pdf}} \\
       \texttt{~~~~~~~~~~~~~~~~~~~~~~~} \> \>  \\
       \texttt{~~~~Replication~Package:~} \> \> \texttt{\href{https://doi.org/10.5281/zenodo.17861977}{10.5281/zenodo.17861977}} \\
       \texttt{~~~~~~~~~~~~~~~~~~~~~~~} \> \>  \\
       \texttt{~~~~Other~Materials:~~~} \> \> \\
-      \texttt{~~~~~Replication~code:~} \> \> \texttt{\href{https://github.com/\owner/\projectname/tree/master/Code/Python}{Code/Python}} \\
+      \texttt{~~~~~Replication~code:~} \> \> \texttt{\href{https://github.com/\owner/\projectname/tree/main/Code/Python}{Code/Python}} \\
     \end{tabbing}
   }
 \end{footnotesize}
 \vspace{-0.3\baselineskip}
 
-\begin{center}
-  \small University of Cambridge
-\end{center}
-\vspace{-0.3\baselineskip}
-
 \pagenumbering{gobble}
 
 \titlepagefinish
-
-\smartbib
 
 \pagebreak
 
@@ -96,75 +95,128 @@
   \tableofcontents
 }{}
 
-\section{Introduction}
-This trimmed version preserves the full section structure while removing most narrative detail.
+\section{Summary}
+Low (2005) studies how households self-insure over the life cycle when future wages are
+uncertain and markets are incomplete \cite{Low2005}. The paper's central point is that labour
+supply is itself an insurance margin: if households can change hours worked, then they can
+respond to wage risk using both savings and labour effort rather than savings alone.
 
-\subsection{Related literature}
-The full literature review is omitted in this lightweight scaffold.
+The REMARK in this repository follows the style of existing econ-ark replications such as
+\texttt{Aiyagari-Idiosyncratic} and \texttt{BufferStock-LifeCycle}: the paper is summarized
+briefly here, while the main computational work is done in the accompanying code. The
+Python implementation reproduces the paper's core comparisons between certainty and
+uncertainty and between flexible and fixed labour supply.
 
-\section{Model}
-We retain one representative equation for compilation and structure checks:
+The main economic conclusions are straightforward. Under uncertainty, households work more
+and consume less early in life. With flexible labour supply, they borrow more when young,
+accumulate more assets in middle age, and generate hours and consumption profiles that are
+closer to the empirical life-cycle patterns discussed in the paper.
+
+\section{Model Setup}
+The model is a partial-equilibrium life-cycle problem in which households choose consumption,
+leisure, and savings subject to wage risk. Period utility takes the Cobb--Douglas CRRA form
 \begin{equation}
-  C_t = \beta \, \mathbb{E}_t[C_{t+1}] + \varepsilon_t .
+  u(c_t,l_t)=\frac{\left(c_t^{\eta} l_t^{1-\eta}\right)^{1-\gamma}}{1-\gamma}.
 \end{equation}
 
-\section{Parameterizing the model}
-Calibration details are intentionally abbreviated.
+Assets evolve according to
+\begin{equation}
+  A_{t+1}=(1+r)\left[A_t + (H-l_t)w_t - c_t\right],
+\end{equation}
+where $H-l_t$ is hours worked. The wage process combines a deterministic age profile with
+permanent and transitory shocks:
+\begin{align}
+  \ln w_t &= \ln w_0 + \alpha_1 t + \alpha_2 t^2 + \ln w_t^P + \nu_t, \\
+  \ln w_t^P &= \ln w_{t-1}^P + \varepsilon_t.
+\end{align}
 
-\section{Comparing fiscal stimulus policies}
-Most policy comparison text is removed; a minimal table is kept.
+The key mechanism is that uncertainty affects both consumption and labour choices. If wages
+are flexible and labour supply is adjustable, the household can react to bad outcomes by
+changing hours, which lowers the utility cost of building precautionary balances. This is what
+distinguishes the model from fixed-hours precautionary-savings frameworks such as
+\cite{Deaton1991Low, GourinchasParker2002Low, Cagetti2003Low}.
+
+\section{Calibration and Computation}
+The paper calibrates the model at annual frequency and chooses the discount factor and the
+utility weight on leisure to match average male hours and median wealth accumulation over
+working life. The wage process moments are drawn from estimates in \cite{MeghirPistaferri2004Low},
+and the key baseline values reported in the paper are summarized below.
 
 \begin{table}[htbp]
   \centering
-  \caption{Illustrative policy comparison}
-  \begin{tabular}{lcc}
+  \caption{Baseline calibration reported in Low (2005)}
+  \begin{tabular}{lc}
     \toprule
-    Policy & Spending effect & Welfare effect \\
+    Parameter & Value \\
     \midrule
-    Stimulus check & Medium & Medium \\
-    UI extension & High & High \\
-    Tax cut & Low & Low \\
+    Real interest rate $r$ & 0.016 \\
+    Relative risk aversion $\gamma$ & 2.2 \\
+    Consumption share $\eta$ & 0.4 \\
+    Wage-growth coefficient $\alpha_1$ & 0.0561 \\
+    Wage-growth coefficient $\alpha_2$ & -0.000599 \\
+    Permanent-shock variance $\sigma^2_{\varepsilon}$ & 0.031 \\
+    Transitory-shock variance $\sigma^2_{\nu}$ & 0.030 \\
+    Social-security replacement rate & 0.55 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\section{Robustness in a HANK and SAM Model}
-Detailed robustness analysis is omitted.
+The computational replication in this repository is implemented in
+\path{Code/Python/Low2005.py}.
+Following the paper, the code focuses on the working-life behaviour that drives the main
+comparative statics: consumption, hours, and assets under certainty versus uncertainty and
+under flexible versus fixed labour supply.
 
-\begin{figure}[htbp]
-  \centering
-  \fbox{\parbox{0.75\linewidth}{\centering Placeholder figure retained to satisfy minimal artifact requirements.}}
-  \caption{Placeholder robustness figure}
-\end{figure}
+\section{Key Results}
+
+\subsection{Flexible labour supply under certainty}
+Under certainty, flexible hours generate a more pronounced life-cycle smoothing pattern than
+fixed hours. Young households borrow more, middle-aged households save more, and hours
+track the deterministic wage profile more closely. In the baseline utility specification,
+consumption and leisure are Frisch substitutes, so the hump in hours worked induces a
+corresponding hump in consumption.
+
+\subsection{The effect of wage uncertainty}
+Introducing uncertainty pushes labour supply upward early in life and lowers consumption at
+young ages. The extra work effort creates a precautionary buffer of assets that can later be
+used to smooth consumption and reduce hours when uncertainty has partially resolved. In the
+paper, this mechanism helps explain why observed hours profiles are flatter than the wage
+profile alone would suggest.
+
+\subsection{Flexible versus fixed labour supply under uncertainty}
+The key comparison in the paper is between economies with uncertain wages but different
+degrees of labour-supply flexibility. Low (2005) finds that flexibility both changes the shape
+of asset accumulation and raises the level of precautionary saving in the calibrated baseline.
+Young households can postpone accumulation because they retain the option to adjust hours
+later, while middle-aged households accumulate more assets before retirement.
+
+\subsection{Alternative preferences}
+The paper also checks robustness to alternative preferences. The qualitative message is
+unchanged: labour flexibility continues to matter for life-cycle asset accumulation, while the
+exact shape of consumption and hours profiles depends on the degree of risk aversion and on
+the substitutability between leisure and consumption.
+
+\begin{enumerate}
+  \item Additive separability between consumption and leisure preserves the precautionary
+  labour-supply motive, but changes the shape of consumption profiles.
+  \item Varying $\gamma$ changes both the strength of precautionary motives and the degree of
+  intertemporal substitution, with flatter hours profiles when risk aversion is higher.
+  \item Replacing the Cobb--Douglas specification with a CES aggregator shows that the
+  qualitative role of labour flexibility is robust, even though the magnitude of consumption and
+  asset responses depends on the substitutability between leisure and consumption.
+\end{enumerate}
 
 \section{Conclusion}
-Main takeaways are intentionally shortened for the stripped document version.
+Low (2005) shows that labour-supply flexibility is an important insurance margin
+in life-cycle models with idiosyncratic wage risk. Ignoring labour supply tends to understate
+how much of observed wealth is precautionary and misstates the age profiles of work,
+consumption, and assets. In the calibrated simulations, flexibility leads households to borrow
+more when young, save more in middle age, and produce life-cycle labour profiles that are
+closer to the data. This is consistent with later quantitative work such as
+\cite{French2004Low}, which also benefits from modelling labour supply jointly with savings
+decisions.
 
 \pagebreak
-
-\webonly{
-  \section*{Endnotes}
-  \theendnotes
-}
-
-\addcontentsline{toc}{section}{References} % Add refs at end of TOC
-
-\clearpage
-\nocite{Bardoczy2022}
-\nocite{Blanchard2010}
-\nocite{Christiano2016}
-\nocite{DenHaan2000}
-\nocite{Gornemann2021}
-\nocite{Ravn2017}
-\nocite{Ravn2021}
-\nocite{Rotemberg1982}
-\nocite{Silva2009}
-\nocite{arsJumpsHumps}
-\nocite{carroll2020modeling}
-\nocite{den2010computational}
-\nocite{fagereng-mpc-2021}
-\nocite{rothstein2017scraping}
-\smartbib
 
 \clearpage
 \section*{Appendices}
@@ -172,7 +224,13 @@ Main takeaways are intentionally shortened for the stripped document version.
 \markboth{APPENDICES}{APPENDICES}
 
 \appendix
-\section{Appendix: Minimal retained content}
-This stripped version keeps one appendix section while removing most appendix material.
+\section{Appendix: Numerical Solution}
+The original appendix solves the model recursively by backward induction over the life cycle.
+After using the intratemporal first-order condition to express leisure as a function of
+consumption and the wage, the dynamic problem can be reduced to solving for the
+consumption rule on a finite grid of states. In the paper, expectations are evaluated
+numerically and policy functions are interpolated between grid points. The HARK code in
+this repository mirrors the economic comparisons of the paper while using modern solution
+tools for the corresponding lifecycle household problem.
 
 \end{document}
