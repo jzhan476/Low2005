@@ -24,7 +24,7 @@ $bibtex = "sh $latexmkroot/\@resources/latexmk/latexmkrc/tools/bibtex_wrapper.sh
 #
 # NOTE: This means latexmk -c will delete .bbl files during cleanup.
 # To preserve .bbl files during cleanup, use the wrapper script:
-#   @resources/latexmk/latexmkrc/latexmk-clean-preserve-bbl.sh -c HAFiscal.tex
+#   latexmk -c
 # Or rely on reproduce_documents.sh's cleanup_auxiliary_files() function
 # which backs up and restores .bbl files around latexmk -c calls.
 $bibtex_use = 2;

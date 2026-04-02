@@ -58,7 +58,7 @@ $bibtex_silent_switch = '-terse'; # Reduce bibtex verbosity.
 # trying to hook into latexmk's cleanup mechanism.
 #
 # Additionally, for direct latexmk -c calls, use the wrapper script:
-#   @resources/latexmk/latexmkrc/latexmk-clean-preserve-bbl.sh -c HAFiscal.tex
+#   latexmk -c (or project-specific clean scripts)
 #
 # See: reproduce/reproduce_documents.sh cleanup_auxiliary_files() function
 

@@ -16,13 +16,13 @@ Python environment with **HARK** (via `econ-ark` in `pyproject.toml`).
 From repository root:
 
 ```bash
-./reproduce_low2005.sh run
-# or
 ./reproduce.sh --comp min
 ```
 
-Notebook:
+Or:
 
 ```bash
-./reproduce_low2005.sh notebook
+cd Code/Python && python Low2005.py
 ```
+
+Notebook: open `Python/Low2005.ipynb` in Jupyter, or run `jupyter notebook Python/Low2005.ipynb` from `Code/`.

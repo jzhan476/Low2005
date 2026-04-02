@@ -84,19 +84,14 @@
 %% ==============================================================================
 %% This section defines metadata in econsocart format, which works for both:
 %% - econsocart (QE submission) - uses commands natively
-%% - econark (working paper) - uses econark-econsocart-compat.sty layer
+%% - econark (working paper) — metadata macros below
 %%
 %% Optional: \MetadataApply (econsocart-style metadata) — not used by Low2005.tex as-is.
 %% ==============================================================================
  
-%% Pre-load abstract content to avoid \spacefactor errors from \input inside nested environments
-%% The abstract file is generated from the main document (Single Source of Truth)
-%% Use \CatchFileDef to read file contents IMMEDIATELY into macro (not delayed via \input)
-%% catchfile is loaded via local-qe.sty when needed
-\IfFileExists{Low2005-Abstract.txt}{%
-  \CatchFileDef{\AbstractText}{Low2005-Abstract.txt}{}%
-}{%
-  \newcommand{\AbstractText}{Abstract not available.}%
+%% Pre-loaded abstract (used by Low2005.tex \begin{abstract}; edit here only)
+\newcommand{\AbstractText}{%
+This paper analyses the incentives to work and to save over the life cycle in the presence of incomplete markets. In a calibrated, partial equilibrium model, flexibility in hours worked changes asset age-profiles: borrowing when young is greater and saving when middle-aged is greater than when labour supply is fixed. Uncertainty causes individuals to work longer hours and to consume less when young. With flexibility over hours, accumulating precautionary assets incurs less of a utility cost and so the level of saving is greater. Further, allowing for flexibility and uncertainty means simulated hours of work and consumption more closely match the age profiles in the data.%
 }
 
 \newcommand{\MetadataApply}{%

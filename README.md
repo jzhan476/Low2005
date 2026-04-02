@@ -14,18 +14,18 @@ Core computational engine: **HARK** (`HARK.ConsumptionSaving.ConsLaborModel`, `C
 |------|------|
 | `REMARK.md` | REMARK metadata + replication checklist |
 | `Code/Python/` | `Low2005.py` / `Low2005.ipynb` — HARK lifecycle replication, figures → `Figures/` |
-| `@resources/econ-ark/` | Econ-ARK badge (`PoweredByEconARK.pdf`, …) for the title page |
+| `@local/` | Project LaTeX config (`local.sty`, `metadata.ltx`, …) |
+| `@resources/` | Bundled `econark` class (`texlive/texmf-local/`), `latexmk/`, `econ-ark/` badge assets |
 | `Low2005.tex` | Single-file LaTeX paper |
 | `reproduce.sh` | Env + document build (`./reproduce.sh --docs main`) and `--comp` for Python |
-| `reproduce_low2005.sh` | Shortcut: `run` or `notebook` for `Code/Python/Low2005.*` |
 
 ## Quick run (Python replication)
 
 ```bash
-./reproduce_low2005.sh run
-# or
 ./reproduce.sh --comp min
 ```
+
+Or from `Code/Python/`: `python Low2005.py`
 
 ## Build the PDF (LaTeX)
 

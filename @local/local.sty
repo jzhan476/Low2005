@@ -26,9 +26,6 @@
 % The 6 unnecessary packages have been removed. If future features require them,
 % they can be re-added with documentation of their specific use case.
 
-% Verbatim environments
-\usepackage{moreverb}             % Enhanced verbatim (provides verbatimwrite environment)
-
 % Table support
 \usepackage{multirow}            % Multi-row cells in tables (REQUIRED by bisection test)
 
@@ -284,14 +281,12 @@
 % \usepackage{lmodern}                 % REMOVED: Latin Modern fonts (cosmetic) - not in base+recommended. Using Computer Modern instead.
 
 % Color package (required by pdforhtml - must load before pdforhtml)
-\usepackage{color}                     % Originally from Notes_Private/Section_calibration_estimation.tex - color support
+\usepackage{color}
 
-\usepackage{pdforhtml}                 % Originally from HAFiscal.tex - allow compile as pdf or html (development only)
+\usepackage{pdforhtml}                 % PDF or HTML (tex4ht); sets \boolean{Web} when building web
 
 % Presentation and development-specific packages
-% \usepackage{econark}                   % econark LaTeX package (development only)
-% NOTE: Commented out - HAFiscal.tex uses \documentclass{econark}, so \usepackage{econark} is not needed
-% and econark.sty file appears to be broken (contains only a path string, not LaTeX code)
+% \usepackage{econark}                   % optional vendor shim (not used; \documentclass{econark} loads .cls)
 % CONDITIONAL SUBFIGURE PACKAGE - VERIFIED COMPATIBLE WITH BOTH CLASSES
 \usepackage{subcaption}                % Modern subfigure environment (tested with econark + econsocart)
 % Note: makecell not added - conflicts with econsocart.cls for QE submissions
@@ -344,13 +339,9 @@
 % NOTE: makeatletter/makeatother must be OUTSIDE \newcommand - catcodes are set at definition time!
 \makeatletter
 \newcommand{\standaloneTableSetup}{%
-  % tex4ht compatibility fix - prevents hanging during HTML compilation  
-  % ⚠️  IMPORTANT: This fix means HTML compilation loses cross-references to main document
+  % tex4ht compatibility fix - prevents hanging during HTML compilation
   \@ifpackageloaded{tex4ht}{%
-    % tex4ht is loaded - skip externaldocument to prevent hanging
   }{%
-    % Normal LaTeX - load externaldocument as usual, but only if .aux file exists
-    % This prevents "Missing \begin{document}" errors when main document hasn't been compiled
     \whenstandalone{%
       \IfFileExists{\latexroot/\projectname.aux}{%
         \externaldocument{\latexroot/\projectname}%

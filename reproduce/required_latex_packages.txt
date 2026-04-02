@@ -137,7 +137,7 @@ cm-super       # ✓ Computer Modern fonts with extended character support
 # manyfoot       - Removed from econark.cls (titlepage \thanks footnotes not used)
 # footmisc       - Removed from econark.cls (titlepage \thanks footnotes not used)
 # lmodern        - Removed from @local/local.sty (cosmetic font, using Computer Modern)
-# wasysym        - Removed from econark-ark-required.sty (symbols like \phone not used)
+# wasysym        - Was in removed vendor shim econark-ark-required.sty (not used by Low2005)
 #
 # Note: 'soul' was initially marked as eliminated but restored on 2025-12-10 after
 # discovering it was still needed in the old GA workflow hardcoded package list.

@@ -14,15 +14,9 @@
 
 % When compiling Web version of paper, construct targets/anchors
 \weborpdf{ % compiling web version
-  % execute this version if compiling with make4ht
   \hypersetup{destlabel=true} % set up html labels
-
 }{
-  % execute this version if compiling with pdflatex
   \provideboolean{showPageHead}{\setboolean{showPageHead}{true}}
-
-  % Enhanced PDF metadata for AI systems and cross-format discovery
-  % Uses macros from @local/metadata.ltx (SST pattern)
   \hypersetup{
     pdftitle={\PDFTitle},
     pdfauthor={\PDFAuthor},
@@ -31,8 +25,7 @@
   }
 }
 
-\webonly{ % footnotes do not work when there is no page footer
-  % execute this version if compiling with make4ht
+\webonly{
   \section*{Endnotes}
   \theendnotes
 }
@@ -60,11 +53,8 @@
 \vspace{-0.5\baselineskip}
 
 \whenintegrated{\label{abstract}} % integrated doc: SST for labels
-\begin{verbatimwrite}{Low2005-Abstract.txt}
-This paper analyses the incentives to work and to save over the life cycle in the presence of incomplete markets. In a calibrated, partial equilibrium model, flexibility in hours worked changes asset age-profiles: borrowing when young is greater and saving when middle-aged is greater than when labour supply is fixed. Uncertainty causes individuals to work longer hours and to consume less when young. With flexibility over hours, accumulating precautionary assets incurs less of a utility cost and so the level of saving is greater. Further, allowing for flexibility and uncertainty means simulated hours of work and consumption more closely match the age profiles in the data.
-\end{verbatimwrite}
 \begin{abstract}
-  \input{Low2005-Abstract.txt}
+  \AbstractText
 \end{abstract}
 \vspace{-0.5\baselineskip}
 

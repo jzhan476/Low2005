@@ -1,7 +1,6 @@
 \RequireVersions{
   *{application}{pdfTeX}  {0000/00/00 v1.40.27}
   *{format} {LaTeX2e}     {2024-11-01 v2.e}
-  *{file}   {Low2005.tex} {0000/00/00 v0.0}
   *{file}   {./._relpath-to-latexroot.ltx}{0000/00/00 v0.0}
   *{file}   {./@resources/project-metadata.ltx}{0000/00/00 v0.0}
   *{file}   {./@resources/tex-paths.ltx}{0000/00/00 v0.0}
@@ -64,7 +63,6 @@
   *{file}   {@resources/project-metadata.ltx}{0000/00/00 v0.0}
   *{file}   {./@resources/tex-paths.ltx}{0000/00/00 v0.0}
   *{file}   {./@local/_inputpaths.ltx}{0000/00/00 v0.0}
-  *{package}{moreverb}    {2008/06/03 v2.3a}
   *{package}{multirow}    {2024/11/12 v2.9}
   *{package}{xr-hyper}    {2024-11-05 v7.01l}
   *{file}   {@local/owner.tex}{0000/00/00 v0.0}
@@ -123,14 +121,12 @@
   *{package}{float}       {2001/11/08 v1.3d}
   *{package}{placeins}    {2005/04/18 v2.2}
   *{file}   {./@local/metadata.ltx}{0000/00/00 v0.0}
-  *{file}   {"Low2005-Abstract.txt"}{0000/00/00 v0.0}
   *{file}   {umsa.fd}     {2013/01/14 v3.01}
   *{file}   {umsb.fd}     {2013/01/14 v3.01}
   *{-------}{Document-specific files:}{----}
   *{file}   {supp-pdf.mkii}{0000/00/00 v0.0}
   *{package}{epstopdf-base}{2020-01-24 v2.11}
   *{file}   {epstopdf-sys.cfg}{2010/07/13 v1.3}
-  *{file}   {Low2005-Abstract.txt}{0000/00/00 v0.0}
   *{file}   {./@resources/econ-ark/PoweredByEconARK.pdf}{0000/00/00 v0.0}
   *{file}   {./@local/acknowledgments.texinput}{0000/00/00 v0.0}
   *{file}   {Low2005.bbl} {0000/00/00 v0.0}

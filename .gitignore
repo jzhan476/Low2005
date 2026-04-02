@@ -363,7 +363,7 @@ ls-R
 *.dat
 make4ht-trials_private
 
-# cursor
+# cursor / local editor
 .specstory/**
 .claude/
 
@@ -371,8 +371,6 @@ make4ht-trials_private
 
 .venw_HAFiscal
 version
-
-.cursorindexingignore
 
 # Prompts
 prompt
@@ -458,10 +456,8 @@ __pycache__/
 HAFiscal_paperpile*.*# Backup files
 *.backup*
 
-# Cursor editor files
+# Cursor editor dotfiles and local project folder (optional)
 .cursor*
-# Exception: Keep SST master files for Cursor indexing
-!.cursorindexingignore.additions
 
 # Bibliography backup files
 *.bbl.bak
@@ -493,7 +489,8 @@ reproduce/reproduce_environment_*.verified
 
 # All verification marker files (global pattern)
 *.verified
-# Editor cache\n.cursorignore\n.cursorindexingignore\n# Local devcontainer artifacts\n.devcontainer/.specstory/
+# Editor cache; local devcontainer artifacts
+.devcontainer/.specstory/
 .specstory/
 *pathtmp
 # Python/Jupyter object cache files (Jacobian matrices)
