@@ -215,7 +215,7 @@ These are not used in current workflows.
 
 1. **Always use `reproduce.sh`** in the parent directory rather than calling these scripts directly, unless you know what you're doing
 2. **Check verification markers** - If environment setup scripts have already created recent `.verified` files, you may not need to run them again
-3. **Computational reproduction** - Requires `Code/HA-Models/` (restore from git if removed in a minimal checkout)
+3. **Computational reproduction** - Runs `Code/Python/Low2005.py` (also available as `Code/Python/Low2005.ipynb`) and writes PNG figures to `Figures/`
 4. **Check benchmarks/** for performance data from previous runs
 5. **Read script headers** - Each script has detailed comments explaining its purpose and usage
 
