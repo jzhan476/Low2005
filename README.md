@@ -166,7 +166,5 @@ Inside the container, the project lives at `/workspace`.
 
 ## Notes
 
-- The repository includes a Zenodo DOI in `CITATION.cff`, but the baseline reproduction workflow
-  is centered on `reproduce.sh`, the environment files, and the generated outputs.
 - The notebook and script implement the same HARK-based workflow in interactive and script forms.
 - If you only want the main paper, use `./reproduce.sh --docs main`.

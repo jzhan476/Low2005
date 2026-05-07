@@ -5,13 +5,21 @@ message: >-
   If you use this replication software, please cite it using the metadata below.
   The academic paper to cite is Low (2005), *Review of Economic Dynamics*.
 type: software
-version: 1.0.0
+version: 1.0.2
+date-released: 2026-05-06
+
 authors:
-  - family-names: Low
-    given-names: Hamish W.
-    affiliation: University of Cambridge
+  - family-names: Zhang
+    given-names: Jiaxuan
+
 repository-code: 'https://github.com/jzhan476/Low2005'
+
+identifiers:
+  - type: url
+    value: "https://github.com/jzhan476/Low2005"
+
 license: Apache-2.0
+
 keywords:
   - life-cycle model
   - labour supply
@@ -22,20 +30,17 @@ keywords:
   - HARK
   - REMARK
   - reproduction
-identifiers:
-  - type: doi
-    description: Zenodo archive (replication package)
-    value: 10.5281/zenodo.17861977
-preferred-citation:
-  type: article
-  title: Self-Insurance in a Life-Cycle Model of Labour Supply and Savings
-  authors:
-    - family-names: Low
-      given-names: Hamish W.
-  year: 2005
-  journal: Review of Economic Dynamics
-  volume: 8
-  issue: 4
-  start: 945
-  end: 975
-  doi: 10.1016/j.red.2005.03.002
+
+references:
+  - type: article
+    title: Self-Insurance in a Life-Cycle Model of Labour Supply and Savings
+    authors:
+      - family-names: Low
+        given-names: Hamish W.
+    year: 2005
+    journal: Review of Economic Dynamics
+    volume: 8
+    issue: 4
+    start: 945
+    end: 975
+    doi: 10.1016/j.red.2005.03.002
