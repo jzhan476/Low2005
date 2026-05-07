@@ -16,9 +16,9 @@ and `ConsIndShockModel`) and a LaTeX paper build rooted at `Low2005.tex`.
 - generated figures under `Figures/`
 - a compiled paper `Low2005.pdf`
 
-The main entrypoint for reproduction is `reproduce.sh`. A bare invocation
-(`./reproduce.sh`) runs the full pipeline (computational replication + paper),
-matching the REMARK convention. For a fast validation path, use
+The main entrypoint for reproduction is `reproduce.sh`. Run it with `--all`
+to execute the full pipeline (computational replication + paper), or with
+`--help` to see all available subcommands. For a fast validation path, use
 `./reproduce_min.sh`.
 
 ## REMARK-Oriented Quick Start
@@ -69,7 +69,7 @@ via `binder/postBuild`.
 After activation you can run the standard reproduction commands:
 
 ```bash
-./reproduce.sh                # full reproduction (default)
+./reproduce.sh --all          # full reproduction
 ./reproduce.sh --comp min     # computation only
 ./reproduce.sh --docs main    # paper only
 ```
@@ -95,7 +95,7 @@ Low2005.pdf
 | `Code/Python/` | `Low2005.py` and `Low2005.ipynb` |
 | `Figures/` | Generated computational output figures |
 | `Low2005.tex` | Main LaTeX paper |
-| `reproduce.sh` | Main orchestration script (full reproduction by default) |
+| `reproduce.sh` | Main orchestration script (use `--all` for full reproduction, `--help` for usage) |
 | `reproduce_min.sh` | Fast validation: computational replication only (no LaTeX build) |
 | `reproduce/` | Supporting environment, build, and utility scripts |
 | `binder/postBuild` | Materializes the pinned Python environment from `uv.lock` |
@@ -129,10 +129,9 @@ Test environments:
 ./reproduce.sh --envt texlive
 ```
 
-Run the full workflow (also the default with no arguments):
+Run the full workflow:
 
 ```bash
-./reproduce.sh           # equivalent to ./reproduce.sh --all (REMARK default)
 ./reproduce.sh --all
 ```
 
