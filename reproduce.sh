@@ -2365,47 +2365,14 @@ case "$ACTION" in
         fi
         ;;
     "")
-        # No arguments provided - show helpful examples (no logging for this)
-        echo "========================================"
-        echo "Low2005 Reproduction Script"
-        echo "========================================"
-        echo ""
-        echo "Run with arguments to reproduce different parts of the project."
-        echo ""
-        echo "📖 QUICK EXAMPLES:"
-        echo ""
-        echo "  # Environment testing:"
-        echo "  ./reproduce.sh --envt               # Test both environments"
-        echo "  ./reproduce.sh --envt texlive       # Test LaTeX only"
-        echo "  ./reproduce.sh --envt comp_uv       # Test Python/UV only"
-        echo ""
-        echo "  # Legacy figure hook (no-op; use --comp min for Low2005 figures):"
-        echo "  ./reproduce.sh --data               # default: all"
-        echo ""
-        echo "  # Computational results:"
-        echo "  ./reproduce.sh --comp min           # Low2005 HARK script (minutes)"
-        echo "  ./reproduce.sh --comp full          # Same script (legacy name)"
-        echo ""
-        echo "  # LaTeX documents:"
-        echo "  ./reproduce.sh --docs main          # Compile paper only"
-        echo "  ./reproduce.sh --docs all           # Include figures, tables, subfiles"
-        echo ""
-        echo "  # Interactive mode:"
-        echo "  ./reproduce.sh --interactive        # Show menu (uses reproduce.py)"
-        echo "  ./reproduce.py                      # Python interactive menu (SST)"
-        echo ""
-        echo "  # Help:"
-        echo "  ./reproduce.sh --help               # Full documentation"
-        echo ""
-        echo "========================================"
-        echo ""
-        echo "💡 TIP: Start with './reproduce.sh --docs main' to test your LaTeX setup"
-        echo "        or './reproduce.sh --help' for complete documentation."
-        echo ""
-        echo "📝 NOTE: All commands are automatically logged to reproduce/logs/"
-        echo "         Monitor progress: tail -f reproduce/logs/latest.log"
-        echo ""
-        exit 0
+        # No arguments provided. Per the REMARK STANDARD, a bare invocation of
+        # `./reproduce.sh` must run and reproduce all the results. Delegate to
+        # the same code path used by `--all`.
+        init_logging "all" "full"
+        log INFO "No arguments provided - running full reproduction (REMARK default)"
+        log INFO "Use './reproduce.sh --help' for granular options"
+        reproduce_all_results
+        exit $?
         ;;
     *)
         log ERROR "Unknown action: $ACTION"

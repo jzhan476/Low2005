@@ -16,7 +16,10 @@ and `ConsIndShockModel`) and a LaTeX paper build rooted at `Low2005.tex`.
 - generated figures under `Figures/`
 - a compiled paper `Low2005.pdf`
 
-The main entrypoint for reproduction is `reproduce.sh`.
+The main entrypoint for reproduction is `reproduce.sh`. A bare invocation
+(`./reproduce.sh`) runs the full pipeline (computational replication + paper),
+matching the REMARK convention. For a fast validation path, use
+`./reproduce_min.sh`.
 
 ## REMARK-Oriented Quick Start
 
@@ -48,24 +51,27 @@ Build the paper:
 
 ### Conda / Binder-compatible setup
 
-For REMARK/Binder compatibility, the canonical conda environment file is:
-
-```bash
-binder/environment.yml
-```
-
-Create the environment with conda:
+For REMARK/Binder compatibility, the canonical conda environment file is
+`binder/environment.yml`. It is intentionally minimal: it installs Python
+plus `uv`, and the actual pinned dependencies are then materialized from
+`uv.lock` (this pattern is endorsed by the REMARK STANDARD for projects whose
+primary environment manager is `uv`, `poetry`, or similar):
 
 ```bash
 conda env create -f binder/environment.yml
 conda activate low2005
+uv sync --frozen          # materialize pinned deps from uv.lock
 ```
 
-You can then run the same reproduction commands:
+When launched on mybinder.org, the same materialization happens automatically
+via `binder/postBuild`.
+
+After activation you can run the standard reproduction commands:
 
 ```bash
-./reproduce.sh --comp min
-./reproduce.sh --docs main
+./reproduce.sh                # full reproduction (default)
+./reproduce.sh --comp min     # computation only
+./reproduce.sh --docs main    # paper only
 ```
 
 ## Expected Outputs
@@ -89,8 +95,10 @@ Low2005.pdf
 | `Code/Python/` | `Low2005.py` and `Low2005.ipynb` |
 | `Figures/` | Generated computational output figures |
 | `Low2005.tex` | Main LaTeX paper |
-| `reproduce.sh` | Main orchestration script |
+| `reproduce.sh` | Main orchestration script (full reproduction by default) |
+| `reproduce_min.sh` | Fast validation: computational replication only (no LaTeX build) |
 | `reproduce/` | Supporting environment, build, and utility scripts |
+| `binder/postBuild` | Materializes the pinned Python environment from `uv.lock` |
 | `@local/` | Local LaTeX configuration |
 | `@resources/` | Bundled LaTeX and project resources |
 
@@ -121,10 +129,17 @@ Test environments:
 ./reproduce.sh --envt texlive
 ```
 
-Run the full workflow:
+Run the full workflow (also the default with no arguments):
 
 ```bash
+./reproduce.sh           # equivalent to ./reproduce.sh --all (REMARK default)
 ./reproduce.sh --all
+```
+
+Fast validation path (computation only, skips LaTeX build):
+
+```bash
+./reproduce_min.sh
 ```
 
 ## System Dependencies

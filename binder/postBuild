@@ -1,0 +1,33 @@
+#!/bin/bash
+# =============================================================================
+# Binder postBuild hook for Low2005
+# =============================================================================
+# Runs after `binder/environment.yml` has been used to build the conda env.
+# Materializes the full, pinned Python environment from `uv.lock` at the
+# repository root (compiled from `pyproject.toml`). This is the recommended
+# REMARK pattern for projects whose primary environment manager is uv.
+# =============================================================================
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_ROOT"
+
+if [[ ! -f "uv.lock" ]]; then
+    echo "ERROR: uv.lock not found at $REPO_ROOT/uv.lock" >&2
+    echo "       The Binder/REMARK environment cannot be materialized." >&2
+    exit 1
+fi
+
+if ! command -v uv >/dev/null 2>&1; then
+    echo "ERROR: 'uv' is not on PATH; binder/environment.yml should have provided it." >&2
+    exit 1
+fi
+
+echo "Materializing pinned Python environment from uv.lock ..."
+uv sync --frozen --no-dev
+
+echo "Registering Jupyter kernel for the project venv ..."
+uv run python -m ipykernel install --user --name low2005 --display-name "Python (Low2005)" || true
+
+echo "binder/postBuild completed."
