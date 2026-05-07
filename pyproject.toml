@@ -2,11 +2,11 @@
 
 [project]
 name = "low2005"
-version = "1.0.0"
+version = "1.0.2"
 description = "Replication of Low (2005) with HARK (REMARK)"
 requires-python = ">=3.9,<3.10"
 authors = [
-    {name = "Hamish W. Low"},
+    {name = "Jiaxuan Zhang"},
 ]
 readme = "README.md"
 license = {text = "Apache-2.0"}

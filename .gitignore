@@ -473,6 +473,7 @@ Thumbs.db
 *.log
 *.fls
 *.fdb_latexmk
+*.dep
 *.out
 *.nav
 *.snm
@@ -483,6 +484,12 @@ Thumbs.db
 #*.tex#
 *.bak*
 .makeWeb-stash-reference
+
+# Compiled paper output: the build/ scratch directory is a reproducible
+# artefact and must not be tracked. The root-level Low2005.pdf, however,
+# is the canonical released paper and IS tracked in git so that readers
+# can open it without first running the full LaTeX toolchain.
+/build/
 
 # Environment verification markers with timestamps (e.g., reproduce_environment_texlive_20251027-0914.verified)
 reproduce/reproduce_environment_*.verified
