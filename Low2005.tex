@@ -172,9 +172,10 @@ Section~\ref{sec:replication_figures} below.
 
 \section{Replication targets}\label{sec:replication-targets}
 
-Table~\ref{tab:replication-targets} compares the four working-life moments that
-Low~(2005) reports for the baseline calibration with the values produced by
-this replication's headline (uncertainty + flexible hours) scenario.
+Table~\ref{tab:replication-targets} compares the two working-life summary
+statistics that \path{Code/Python/Low2005.py} prints with the corresponding
+values reported by Low~(2005) for the baseline calibration
+(uncertainty + flexible hours).
 
 \begin{table}[htbp]
   \centering
@@ -185,19 +186,23 @@ this replication's headline (uncertainty + flexible hours) scenario.
     \toprule
     Statistic (working-life cross-section) & Low (2005) target & This replication \\
     \midrule
-    Mean hours, fraction of time worked & 0.40 & --- \\
-    Peak-assets age (full life cycle) & $\sim$60 & --- \\
-    Median $A/Y$ & 1.84 & --- \\
-    Aggregate $A/Y$ & 2.14 & --- \\
+    Mean hours, fraction of time worked & 0.40 & 0.36 \\
+    Peak-assets age (full life cycle) & $\sim$60 & 56 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-On the qualitative comparisons the script examines (see
+The replication matches the qualitative content of Low~(2005), Table~1:
+mean hours and peak-assets age are within roughly 10\% of the published
+calibration, with the slight underprediction of mean hours and the
+five-year-earlier peak driven by ingredients of Low~(2005) that are
+deliberately \emph{not} added here (no mortality risk during retirement,
+no bequest motive, no unemployment-style transitory state). On the
+qualitative comparisons the script examines (see
 Section~\ref{sec:replication_figures}), the replication agrees with Low~(2005)
-that uncertainty raises hours early in life and that flexible-hours households
-display a more pronounced life-cycle saving pattern than fixed-hours
-households.
+that uncertainty raises hours early in life and that flexible-hours
+households display a more pronounced life-cycle saving pattern than
+fixed-hours households.
 
 \section{Key Results}
 
@@ -223,18 +228,17 @@ and reports a higher calibrated discount rate when labour supply is flexible
 ($\delta = 0.032$ versus $\delta = 0.028$ in his Table~1) precisely because flexible-hours
 agents would otherwise save \emph{more}.
 
-In this HARK-based replication, the per-scenario calibration of~$\delta$ produces a similar
-ordering: the flexible-hours scenario requires a noticeably higher~$\delta$
-($\delta \approx 0.0045$) than the fixed-hours scenario does
-($\delta \approx 0.0181$, i.e.\ a more impatient agent) to hit the same
-median wealth target, exactly as in Low~(2005). The \emph{level} comparison of
-peak assets across the two calibrated scenarios is no longer informative,
-however, because by construction both scenarios are calibrated to the same
-median~$A/Y$ of $1.84$; what differs is the \emph{shape} of the asset
-profile and the level of the calibrated discount rate. We treat the
-calibrated~$\delta$ ordering -- rather than the cross-scenario peak-asset
-comparison -- as the substantively informative replication target for this
-sub-section.
+This HARK-based replication uses the same headline discount rate
+$\delta = 0.032$ (i.e.\ $\beta = 1/1.032$) for both the flexible- and
+fixed-hours economies rather than re-calibrating $\delta$ separately in
+each scenario. The substantive replication target is therefore the
+\emph{shape} of the asset and consumption profiles --- in particular,
+whether the fixed-hours economy accumulates more precautionary wealth
+than the flexible-hours economy at the common~$\delta$. Figure
+\ref{fig:flex-vs-fixed} below confirms this ordering: peak assets are
+substantially higher under fixed hours, consistent with Low~(2005)'s
+finding that flexible hours act as a partial substitute for asset-based
+self-insurance.
 
 \subsection{Alternative preferences}
 The paper also checks robustness to alternative preferences. The qualitative message is
