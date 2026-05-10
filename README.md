@@ -141,6 +141,15 @@ Fast validation path (computation only, skips LaTeX build):
 ./reproduce_min.sh
 ```
 
+## Expected Runtime
+
+Approximate wall-clock times measured on Apple M3, 24 GB RAM, macOS 26.5:
+
+- `./reproduce.sh --docs main` — about 10 seconds
+- `./reproduce.sh --comp min` (= `./reproduce_min.sh`) — about 20 seconds
+- `./reproduce.sh --comp full` — about 20 seconds
+- `./reproduce.sh --all` — about 20 seconds
+
 ## System Dependencies
 
 The Python environment is managed with UV or conda, but document reproduction also requires
