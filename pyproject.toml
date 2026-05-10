@@ -2,9 +2,10 @@
 
 [project]
 name = "low2005"
-version = "1.0.2"
+version = "1.1.0"
 description = "Replication of Low (2005) with HARK (REMARK)"
-requires-python = ">=3.9,<3.10"
+# Matches `binder/environment.yml` (python=3.11) and keeps 3.9+ for local UV installs.
+requires-python = ">=3.9,<3.13"
 authors = [
     {name = "Jiaxuan Zhang"},
 ]
@@ -16,6 +17,9 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Economics",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: Apache Software License",
 ]
 

@@ -5,8 +5,8 @@ message: >-
   If you use this replication software, please cite it using the metadata below.
   The academic paper to cite is Low (2005), *Review of Economic Dynamics*.
 type: software
-version: 1.0.2
-date-released: 2026-05-06
+version: 1.1.0
+date-released: 2026-05-10
 
 authors:
   - family-names: Zhang
