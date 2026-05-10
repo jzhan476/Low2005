@@ -79,9 +79,6 @@ After activation you can run the standard reproduction commands:
 After `./reproduce.sh --comp min`, the main expected outputs are:
 
 - PNG figures under `Figures/`
-- `Figures/calibration_table.tex` — Low (2005) Table 1 calibration, auto-generated from `Code/Python/Low2005.py`
-- `Figures/replication_summary.tex` — replication-target tables (paper vs this replication), auto-\input{} by `Low2005.tex`
-- `Figures/replication_summary.json` — machine-readable calibration, numerical settings (including `simulation_seed`), and headline / per-scenario statistics for auditability
 
 After `./reproduce.sh --docs main`, the main expected output is:
 
