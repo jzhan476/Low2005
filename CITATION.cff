@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 title: >-
-  Low (2005) replication: Self-Insurance in a Life-Cycle Model of Labour Supply and Savings
+  Low (2005) replication: Self-Insurance in a Life-Cycle Model of Labor Supply and Savings
 message: >-
   If you use this replication software, please cite it using the metadata below.
   The academic paper to cite is Low (2005), *Review of Economic Dynamics*.
@@ -22,7 +22,7 @@ license: Apache-2.0
 
 keywords:
   - life-cycle model
-  - labour supply
+  - labor supply
   - precautionary saving
   - incomplete markets
   - self-insurance

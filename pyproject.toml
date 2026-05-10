@@ -11,7 +11,7 @@ authors = [
 ]
 readme = "README.md"
 license = {text = "Apache-2.0"}
-keywords = ["economics", "life-cycle", "labour-supply", "precautionary-saving", "HARK", "econ-ark"]
+keywords = ["economics", "life-cycle", "labor-supply", "precautionary-saving", "HARK", "econ-ark"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",

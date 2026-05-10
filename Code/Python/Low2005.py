@@ -153,7 +153,7 @@ def retirement_paths(history, *, CRRA, T_ret, replacement_rate,
     in the life-cycle figures -- this reflects the resolution of
     income uncertainty, not an error in the code.  A fully
     lifecycle-consistent solution would require a HARK agent that
-    supports both a labour choice and a zero-wage retirement stage in
+    supports both a labor choice and a zero-wage retirement stage in
     the same backwards-induction problem, which is left as a future
     extension.
 
@@ -248,7 +248,7 @@ base_dict = {
     # Use the natural borrowing limit (most-negative `a` for which the
     # consumer can repay in the worst-case shock realization).  The same
     # choice is used for the fixed-hours benchmark below so that the
-    # flexible-vs-fixed comparison isolates labour-supply flexibility
+    # flexible-vs-fixed comparison isolates labor-supply flexibility
     # rather than mixing it with a tighter ad-hoc constraint.
     "BoroCnstArt": None,
     "LbrCostCoeffs": [float(np.log(alpha_hark))],
@@ -358,9 +358,9 @@ fixed_dict = {
     "IncUnempRet": 0.0,
     # Match the borrowing-constraint specification used by the flexible
     # model above so that `flexible_vs_fixed.png` reflects only the
-    # labour-supply margin.  Earlier versions used `BoroCnstArt=0.0`
+    # labor-supply margin.  Earlier versions used `BoroCnstArt=0.0`
     # here while the flexible model used `None`, which conflated
-    # labour flexibility with a tighter ad-hoc no-borrowing constraint.
+    # labor flexibility with a tighter ad-hoc no-borrowing constraint.
     "BoroCnstArt": None,
     "aXtraMin": 0.001,
     "aXtraMax": 50.0,

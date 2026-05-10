@@ -40,11 +40,11 @@
   \newcommand{\versn}{Web}
 }
 
-\title{A Replication of Low (2005): Self-Insurance in a Life-Cycle Model of Labour Supply and Savings}
+\title{A Replication of Low (2005): Self-Insurance in a Life-Cycle Model of Labor Supply and Savings}
 
 \author{REMARK Replication Package}
 
-\keywords{Precautionary saving; Life-cycle labour supply}
+\keywords{Precautionary saving; Life-cycle labor supply}
 
 \jelclass{D91; H31}
 
@@ -96,16 +96,16 @@ comparisons. In this repository, the computational replication is implemented in
 
 \section{Summary}
 \citet{Low2005} studies how households self-insure over the life cycle when future wages are
-uncertain and markets are incomplete. The paper's central point is that labour
+uncertain and markets are incomplete. The paper's central point is that labor
 supply is itself an insurance margin: if households can change hours worked, then they can
-respond to wage risk using both savings and labour effort rather than savings alone.
+respond to wage risk using both savings and labor effort rather than savings alone.
 
 This REMARK summarizes the paper briefly while leaving the main computational work to the
 accompanying code. The Python implementation reproduces the paper's core comparisons
-between certainty and uncertainty and between flexible and fixed labour supply.
+between certainty and uncertainty and between flexible and fixed labor supply.
 
 The main economic conclusions are straightforward. Under uncertainty, households work more
-and consume less early in life. With flexible labour supply, they borrow more when young,
+and consume less early in life. With flexible labor supply, they borrow more when young,
 accumulate more assets in middle age, and generate hours and consumption profiles that are
 closer to the empirical life-cycle patterns discussed in the paper.
 
@@ -127,8 +127,8 @@ permanent and transitory shocks:
   \ln w_t^P &= \ln w_{t-1}^P + \varepsilon_t.
 \end{align}
 
-The key mechanism is that uncertainty affects both consumption and labour choices. If wages
-are flexible and labour supply is adjustable, the household can react to bad outcomes by
+The key mechanism is that uncertainty affects both consumption and labor choices. If wages
+are flexible and labor supply is adjustable, the household can react to bad outcomes by
 changing hours, which lowers the utility cost of building precautionary balances. This is what
 distinguishes the model from fixed-hours precautionary-savings frameworks such as
 \citet{Deaton1991Low, GourinchasParker2002Low, Cagetti2003Low}.
@@ -165,9 +165,9 @@ and the key baseline values reported in the paper are summarized below.
 
 The computational replication in this repository is implemented in
 \path{Code/Python/Low2005.py}.
-Following the paper, the code focuses on the working-life behaviour that drives the main
+Following the paper, the code focuses on the working-life behavior that drives the main
 comparative statics: consumption, hours, and assets under certainty versus uncertainty and
-under flexible versus fixed labour supply. The simulation uses a fixed random seed and
+under flexible versus fixed labor supply. The simulation uses a fixed random seed and
 HARK's \texttt{LaborIntMargConsumerType} and \texttt{IndShockConsumerType} for the
 flexible-hours and fixed-hours economies, respectively. Retirement (ages~65--84) is
 appended as a closed-form deterministic forward extension for plotting only; see
@@ -209,7 +209,7 @@ fixed-hours households.
 
 \section{Key Results}
 
-\subsection{Flexible labour supply under certainty}
+\subsection{Flexible labor supply under certainty}
 Under certainty, flexible hours generate a more pronounced life-cycle smoothing pattern than
 fixed hours. Young households borrow more, middle-aged households save more, and hours
 track the deterministic wage profile more closely. In the baseline utility specification,
@@ -217,17 +217,17 @@ consumption and leisure are Frisch substitutes, so the hump in hours worked indu
 corresponding hump in consumption.
 
 \subsection{The effect of wage uncertainty}
-Introducing uncertainty pushes labour supply upward early in life and lowers consumption at
+Introducing uncertainty pushes labor supply upward early in life and lowers consumption at
 young ages. The extra work effort creates a precautionary buffer of assets that can later be
 used to smooth consumption and reduce hours when uncertainty has partially resolved. In the
 paper, this mechanism helps explain why observed hours profiles are flatter than the wage
 profile alone would suggest.
 
-\subsection{Flexible versus fixed labour supply under uncertainty}\label{sec:flex-vs-fixed}
+\subsection{Flexible versus fixed labor supply under uncertainty}\label{sec:flex-vs-fixed}
 The key comparison in the paper is between economies with uncertain wages but different
-degrees of labour-supply flexibility. Low (2005) finds that flexibility both changes the shape
+degrees of labor-supply flexibility. Low (2005) finds that flexibility both changes the shape
 of asset accumulation and raises the level of precautionary saving in the calibrated baseline,
-and reports a higher calibrated discount rate when labour supply is flexible
+and reports a higher calibrated discount rate when labor supply is flexible
 ($\delta = 0.032$ versus $\delta = 0.028$ in his Table~1) precisely because flexible-hours
 agents would otherwise save \emph{more}.
 
@@ -245,17 +245,17 @@ self-insurance.
 
 \subsection{Alternative preferences}
 The paper also checks robustness to alternative preferences. The qualitative message is
-unchanged: labour flexibility continues to matter for life-cycle asset accumulation, while the
+unchanged: labor flexibility continues to matter for life-cycle asset accumulation, while the
 exact shape of consumption and hours profiles depends on the degree of risk aversion and on
 the substitutability between leisure and consumption.
 
 \begin{enumerate}
   \item Additive separability between consumption and leisure preserves the precautionary
-  labour-supply motive, but changes the shape of consumption profiles.
+  labor-supply motive, but changes the shape of consumption profiles.
   \item Varying $\gamma$ changes both the strength of precautionary motives and the degree of
   intertemporal substitution, with flatter hours profiles when risk aversion is higher.
   \item Replacing the Cobb--Douglas specification with a CES aggregator shows that the
-  qualitative role of labour flexibility is robust, even though the magnitude of consumption and
+  qualitative role of labor flexibility is robust, even though the magnitude of consumption and
   asset responses depends on the substitutability between leisure and consumption.
 \end{enumerate}
 
@@ -268,7 +268,7 @@ Working-life profiles (ages 25--64) are produced by HARK's
 \texttt{LaborIntMargConsumerType} and \texttt{IndShockConsumerType},
 each solved with a deterministic retirement-stage continuation value
 spliced in as the terminal solution so that working-life agents
-internalise the retirement-saving motive. Retirement-age profiles
+internalize the retirement-saving motive. Retirement-age profiles
 (65--84) themselves are appended as a closed-form deterministic
 forward extension for plotting only -- each simulated agent enters
 retirement with their terminal assets and a constant pension and
@@ -312,7 +312,7 @@ mark the age at which retirement begins.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.95\textwidth]{Figures/flexible_vs_fixed.png}
-  \caption{Flexible versus fixed labour supply under wage
+  \caption{Flexible versus fixed labor supply under wage
   uncertainty: mean consumption and mean assets over the life cycle
   (cf.\ Low 2005, Figure~6).}
   \label{fig:flex-vs-fixed}
@@ -321,13 +321,13 @@ mark the age at which retirement begins.
 \clearpage
 
 \section{Conclusion}
-Low (2005) shows that labour-supply flexibility is an important insurance margin
-in life-cycle models with idiosyncratic wage risk. Ignoring labour supply tends to understate
+Low (2005) shows that labor-supply flexibility is an important insurance margin
+in life-cycle models with idiosyncratic wage risk. Ignoring labor supply tends to understate
 how much of observed wealth is precautionary and misstates the age profiles of work,
 consumption, and assets. In the calibrated simulations, flexibility leads households to borrow
-more when young, save more in middle age, and produce life-cycle labour profiles that are
+more when young, save more in middle age, and produce life-cycle labor profiles that are
 closer to the data. This is consistent with later quantitative work such as
-\citet{French2004Low}, which also benefits from modelling labour supply jointly with savings
+\citet{French2004Low}, which also benefits from modeling labor supply jointly with savings
 decisions.
 
 \pagebreak
@@ -345,6 +345,6 @@ consumption and the wage, the dynamic problem can be reduced to solving for the
 consumption rule on a finite grid of states. In the paper, expectations are evaluated
 numerically and policy functions are interpolated between grid points. The HARK code in
 this repository mirrors the economic comparisons of the paper while using modern solution
-tools for the corresponding lifecycle household problem.
+tools for the corresponding life-cycle household problem.
 
 \end{document}

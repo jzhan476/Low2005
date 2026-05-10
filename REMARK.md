@@ -9,10 +9,10 @@ tags:
   - REMARK
   - Reproduction
   - LifeCycle
-  - LabourSupply
+  - LaborSupply
 keywords:
   - Self-Insurance
-  - Labour Supply
+  - Labor Supply
   - Savings
   - Incomplete Markets
   - Life-Cycle
@@ -33,6 +33,6 @@ DOI: <https://doi.org/10.1016/j.red.2005.03.002>
 
 ## Replication status
 
-1. HARK lifecycle replication: `Code/Python/Low2005.py` / `Low2005.ipynb` (`LaborIntMargConsumerType`, `IndShockConsumerType`).
+1. HARK life-cycle replication: `Code/Python/Low2005.py` / `Low2005.ipynb` (`LaborIntMargConsumerType`, `IndShockConsumerType`).
 2. Figures written to `Figures/`; build the PDF with `./reproduce.sh --docs main`.
 3. Environments: `pyproject.toml` / `uv.lock` with `requires-python = ">=3.9,<3.13"`; Binder bootstraps **Python 3.11** via `binder/environment.yml` + `binder/postBuild` (`uv sync --frozen`).
