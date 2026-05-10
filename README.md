@@ -52,10 +52,11 @@ Build the paper:
 ### Conda / Binder-compatible setup
 
 For REMARK/Binder compatibility, the canonical conda environment file is
-`binder/environment.yml`. It is intentionally minimal: it installs Python
-plus `uv`, and the actual pinned dependencies are then materialized from
+`binder/environment.yml`. It is intentionally minimal: it installs **Python 3.11**
+(from conda-forge) plus `uv`, and the actual pinned dependencies are then materialized from
 `uv.lock` (this pattern is endorsed by the REMARK STANDARD for projects whose
-primary environment manager is `uv`, `poetry`, or similar):
+primary environment manager is `uv`, `poetry`, or similar). The root `pyproject.toml`
+declares `requires-python = ">=3.9,<3.13"`, so local installs on 3.9–3.12 are also supported.
 
 ```bash
 conda env create -f binder/environment.yml
@@ -92,7 +93,9 @@ Low2005.pdf
 |------|------|
 | `README.md` | Top-level overview and reproduction instructions |
 | `REMARK.md` | REMARK metadata and short replication summary |
-| `CITATION.cff` | Citation metadata for the repository |
+| `CITATION.cff` | Citation metadata for the repository (software; v1.1.0) |
+| `LICENSE` | Apache-2.0 license |
+| `Dockerfile` | Container image (TeX Live + `uv` environment) |
 | `binder/environment.yml` | REMARK/Binder-compatible conda environment file |
 | `Code/Python/` | `Low2005.py` and `Low2005.ipynb` |
 | `Figures/` | Generated computational output figures |
@@ -145,12 +148,14 @@ Fast validation path (computation only, skips LaTeX build):
 
 ## Expected Runtime
 
-Approximate wall-clock times measured on Apple M3, 24 GB RAM, macOS 26.5:
+Approximate wall-clock times (order of magnitude; depends on CPU and cache state):
 
-- `./reproduce.sh --docs main` — about 10 seconds
-- `./reproduce.sh --comp min` (= `./reproduce_min.sh`) — about 20 seconds
-- `./reproduce.sh --comp full` — about 20 seconds
-- `./reproduce.sh --all` — about 20 seconds
+- `./reproduce.sh --docs main` — often about **8–15 seconds**
+- `./reproduce.sh --comp min` (same as `./reproduce_min.sh`) — often about **5–15 seconds**
+- `./reproduce.sh --comp full` — similar to `--comp min` in this package
+- `./reproduce.sh --all` — sum of the two steps above (typically **under 30 seconds**)
+
+On a recent Apple‑silicon laptop with a warm `uv` environment, comp + docs each often finish in roughly **5–10 seconds**.
 
 ## System Dependencies
 
