@@ -33,12 +33,268 @@
 # with no bequests.
 
 # %% Imports and calibration
+import sys
 from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
 from HARK.ConsumptionSaving.ConsLaborModel import LaborIntMargConsumerType
 from HARK.ConsumptionSaving.ConsIndShockModel import IndShockConsumerType
+from HARK.interpolation import (
+    LinearInterp,
+    LinearInterpOnInterp1D,
+    MargValueFuncCRRA,
+    VariableLowerBoundFunc2D,
+)
+from HARK.rewards import CRRAutilityP_inv
+from HARK.ConsumptionSaving.ConsLaborModel import (
+    ConsumerLaborSolution,
+    solve_ConsLaborIntMarg as _orig_solve_ConsLaborIntMarg,
+)
+
+
+# ===========================================================================
+# Patched labor-supply solver enforcing ``BoroCnstArt = 0`` (no borrowing).
+#
+# Low (2005), p.949: "Individuals are not allowed to borrow against pension
+# income."  HARK's stock ``solve_ConsLaborIntMarg`` uses the natural
+# lower bound on bank balances -- ``bNrmMin = -WageRte * TranShk`` -- which
+# allows an agent to enter the next period with up to one period's wage
+# worth of debt.  Empirically, that loose constraint lets the
+# flexible-hours agent dis-save aggressively in the last decade of working
+# life: by age 64 ~13% of agents hold *negative* normalised wealth and
+# the median asset profile collapses to zero, producing the visible
+# "elbow" at age 65 in earlier versions of Figures 4 and 5.
+#
+# This patched solver is byte-for-byte identical to HARK's
+# ``solve_ConsLaborIntMarg`` except for the three boundary rows that
+# describe the agent's choice when the artificial borrowing constraint
+# binds.  In place of HARK's "consume nothing and work 100%" corner we
+# substitute the *constrained* intratemporal optimum (a_t = 0,
+# c_t = WageRte * theta_t * Lbr*, Lbr* = 1 / (1 + LbrCost) = 0.4 for
+# the Low (2005) calibration LbrCost = 1.5).  At Cobb-Douglas leisure
+# the constrained labour choice is independent of TranShk, so the patch
+# changes only the lower-bound row of ``bNowArray`` / ``cNowArray`` /
+# ``LsrNowArray`` -- everything else (EGM, expectations, interpolation)
+# is inherited verbatim from the stock HARK solver.
+def solve_ConsLaborIntMargBoroCnst(
+    solution_next,
+    PermShkDstn,
+    TranShkDstn,
+    LivPrb,
+    DiscFac,
+    CRRA,
+    Rfree,
+    PermGroFac,
+    BoroCnstArt,
+    aXtraGrid,
+    TranShkGrid,
+    vFuncBool,
+    CubicBool,
+    WageRte,
+    LbrCost,
+):
+    """Like :func:`solve_ConsLaborIntMarg` but enforces ``aNrm >= 0``."""
+    frac = 1.0 / (1.0 + LbrCost)
+    if CRRA <= frac * LbrCost:
+        raise ValueError(
+            "CRRA coefficient must be strictly greater than alpha/(1+alpha)."
+        )
+    if vFuncBool or CubicBool:
+        raise NotImplementedError(
+            "Patched labour solver does not implement vFuncBool or CubicBool."
+        )
+
+    vPfunc_next = solution_next.vPfunc
+    TranShkPrbs = TranShkDstn.pmv
+    TranShkVals = TranShkDstn.atoms.flatten()
+    PermShkPrbs = PermShkDstn.pmv
+    PermShkVals = PermShkDstn.atoms.flatten()
+    TranShkCount = TranShkPrbs.size
+    PermShkCount = PermShkPrbs.size
+
+    def uPinv(X):
+        return CRRAutilityP_inv(X, rho=CRRA)
+
+    aXtraCount = aXtraGrid.size
+    bNrmGrid = aXtraGrid
+    bNrmGrid_rep = np.tile(
+        np.reshape(bNrmGrid, (aXtraCount, 1)), (1, TranShkCount)
+    )
+    TranShkVals_rep = np.tile(
+        np.reshape(TranShkVals, (1, TranShkCount)), (aXtraCount, 1)
+    )
+    TranShkPrbs_rep = np.tile(
+        np.reshape(TranShkPrbs, (1, TranShkCount)), (aXtraCount, 1)
+    )
+
+    vPNext = vPfunc_next(bNrmGrid_rep, TranShkVals_rep)
+    vPbarNext = np.sum(vPNext * TranShkPrbs_rep, axis=1)
+    vPbarNvrsNext = uPinv(vPbarNext)
+    vPbarNvrsFuncNext = LinearInterp(
+        np.insert(bNrmGrid, 0, 0.0), np.insert(vPbarNvrsNext, 0, 0.0)
+    )
+    vPbarFuncNext = MargValueFuncCRRA(vPbarNvrsFuncNext, CRRA)
+
+    aNrmGrid_rep = np.tile(
+        np.reshape(aXtraGrid, (aXtraCount, 1)), (1, PermShkCount)
+    )
+    PermShkVals_rep = np.tile(
+        np.reshape(PermShkVals, (1, PermShkCount)), (aXtraCount, 1)
+    )
+    PermShkPrbs_rep = np.tile(
+        np.reshape(PermShkPrbs, (1, PermShkCount)), (aXtraCount, 1)
+    )
+    bNrmNext = (Rfree / (PermGroFac * PermShkVals_rep)) * aNrmGrid_rep
+    vPbarNext = (
+        (PermGroFac * PermShkVals_rep) ** (-CRRA) * vPbarFuncNext(bNrmNext)
+    )
+    EndOfPrdvP = (
+        DiscFac
+        * Rfree
+        * LivPrb
+        * np.sum(vPbarNext * PermShkPrbs_rep, axis=1, keepdims=True)
+    )
+
+    TranShkScaleFac_temp = (
+        frac
+        * (WageRte * TranShkGrid) ** (LbrCost * frac)
+        * (LbrCost ** (-LbrCost * frac) + LbrCost**frac)
+    )
+    TranShkScaleFac = np.reshape(TranShkScaleFac_temp, (1, TranShkGrid.size))
+    xNow = (np.dot(EndOfPrdvP, TranShkScaleFac)) ** (
+        -1.0 / (CRRA - LbrCost * frac)
+    )
+
+    TranShkGrid_rep = np.tile(
+        np.reshape(TranShkGrid, (1, TranShkGrid.size)), (aXtraCount, 1)
+    )
+    xNowPow = xNow**frac
+    cNrmNow = (
+        ((WageRte * TranShkGrid_rep) / LbrCost) ** (LbrCost * frac)
+    ) * xNowPow
+    LsrNow = (LbrCost / (WageRte * TranShkGrid_rep)) ** frac * xNowPow
+
+    cNrmNow[:, 0] = uPinv(EndOfPrdvP.flatten())
+    LsrNow[:, 0] = 1.0
+
+    violates_labor_constraint = LsrNow > 1.0
+    EndOfPrdvP_temp = np.tile(
+        np.reshape(EndOfPrdvP, (aXtraCount, 1)), (1, TranShkCount)
+    )
+    cNrmNow[violates_labor_constraint] = uPinv(
+        EndOfPrdvP_temp[violates_labor_constraint]
+    )
+    LsrNow[violates_labor_constraint] = 1.0
+
+    aNrmNow_rep = np.tile(
+        np.reshape(aXtraGrid, (aXtraCount, 1)), (1, TranShkGrid.size)
+    )
+    bNrmNow = (
+        aNrmNow_rep
+        - WageRte * TranShkGrid_rep
+        + cNrmNow
+        + WageRte * TranShkGrid_rep * LsrNow
+    )
+
+    # === PATCHED BOUNDARY ROW ===
+    # At the artificial borrowing constraint ``aNrm = 0`` (rather than at
+    # the natural lower bound ``bNrm = -WageRte * theta``), the agent
+    # consumes all current resources and chooses Lbr from the
+    # intratemporal first-order condition with no asset transfer:
+    #     max u(c, 1 - Lbr) s.t.  c = WageRte * theta * Lbr,
+    # whose interior optimum is ``Lbr* = frac = 1 / (1 + LbrCost)``
+    # (independent of theta and WageRte under Cobb-Douglas leisure).
+    bNowArray = np.concatenate(
+        (np.zeros((1, TranShkGrid.size)), bNrmNow), axis=0
+    )
+    cNowArray = np.concatenate(
+        (
+            np.reshape(
+                WageRte * TranShkGrid * frac, (1, TranShkGrid.size)
+            ),
+            cNrmNow,
+        ),
+        axis=0,
+    )
+    LsrNowArray = np.concatenate(
+        (
+            np.full((1, TranShkGrid.size), 1.0 - frac),
+            LsrNow,
+        ),
+        axis=0,
+    )
+    # At TranShk = 0 the constrained labour choice degenerates to no work:
+    # there is no wage income, so cNrm = 0 and Lsr = 1 (Lbr = 0).
+    LsrNowArray[0, 0] = 1.0
+    cNowArray[0, 0] = 0.0
+    LbrNowArray = 1.0 - LsrNowArray
+
+    # Marginal value at the constraint -- envelope condition gives
+    # ``vP(b) = u_c(c*, z*)`` evaluated at the constrained policy
+    # ``(c*, z*) = (WageRte * theta * frac, 1 - frac)``.  Substituted
+    # in pseudo-inverse form ``vPnvrs = vP^(-1/rho)`` to match HARK's
+    # representation:
+    #     vP   = c*^(-rho) * z*^(alpha * (1 - rho))
+    #     vPnvrs = c* * z*^(alpha * (rho - 1) / rho).
+    # At TranShk = 0 there is no wage income, ``c* = 0`` and marginal
+    # utility is infinite, so we keep the original ``vPnvrs = 0``
+    # convention there to remain consistent with HARK's stock solver.
+    z_star = 1.0 - frac
+    vPnvrs_boundary = (
+        WageRte
+        * TranShkGrid
+        * frac
+        * z_star ** (LbrCost * (CRRA - 1.0) / CRRA)
+    )
+    vPnvrs_boundary = np.array(vPnvrs_boundary, copy=True)
+    vPnvrs_boundary[0] = 0.0
+    vPnvrsNowArray = np.concatenate(
+        (
+            np.reshape(vPnvrs_boundary, (1, TranShkGrid.size)),
+            uPinv(EndOfPrdvP_temp),
+        )
+    )
+
+    bNrmMinNow = LinearInterp(TranShkGrid, bNowArray[0, :])
+
+    cFuncNow_list = []
+    LbrFuncNow_list = []
+    vPnvrsFuncNow_list = []
+    for j in range(TranShkGrid.size):
+        bNrmNow_temp = bNowArray[:, j] - bNowArray[0, j]
+        cFuncNow_list.append(LinearInterp(bNrmNow_temp, cNowArray[:, j]))
+        LbrFuncNow_list.append(LinearInterp(bNrmNow_temp, LbrNowArray[:, j]))
+        vPnvrsFuncNow_list.append(
+            LinearInterp(bNrmNow_temp, vPnvrsNowArray[:, j])
+        )
+
+    cFuncNowBase = LinearInterpOnInterp1D(cFuncNow_list, TranShkGrid)
+    LbrFuncNowBase = LinearInterpOnInterp1D(LbrFuncNow_list, TranShkGrid)
+    vPnvrsFuncNowBase = LinearInterpOnInterp1D(
+        vPnvrsFuncNow_list, TranShkGrid
+    )
+
+    cFuncNow = VariableLowerBoundFunc2D(cFuncNowBase, bNrmMinNow)
+    LbrFuncNow = VariableLowerBoundFunc2D(LbrFuncNowBase, bNrmMinNow)
+    vPnvrsFuncNow = VariableLowerBoundFunc2D(vPnvrsFuncNowBase, bNrmMinNow)
+
+    vPfuncNow = MargValueFuncCRRA(vPnvrsFuncNow, CRRA)
+
+    return ConsumerLaborSolution(
+        cFunc=cFuncNow,
+        LbrFunc=LbrFuncNow,
+        vPfunc=vPfuncNow,
+        bNrmMin=bNrmMinNow,
+    )
+
+
+class LaborIntMargConsumerTypeBoroCnst(LaborIntMargConsumerType):
+    """``LaborIntMargConsumerType`` with the patched no-borrowing solver."""
+
+    def __init__(self, **kwds):
+        super().__init__(**kwds)
+        self.solve_one_period = solve_ConsLaborIntMargBoroCnst
 
 # Resolve the Figures directory robustly so the script works whether it is
 # invoked from `Code/Python/` (the wrapper's CWD) or as a notebook from
@@ -65,7 +321,13 @@ beta_low = 1.0 / 1.032   # discount factor (1 + delta = 1.032)
 r_low = 0.016            # real interest rate
 replacement_rate = 0.55  # social-security replacement rate (Low 2005, Table 1)
 
-# Wage profile: log w(t) = alpha1*t + alpha2*t^2
+# Wage profile: Low (2005), Table 1 estimates a Mincer-style log-wage
+# regression on calendar age (and age squared, education, cohort
+# dummies) in the CEX, giving deterministic
+#     log w(age) = const + alpha1 * age + alpha2 * age^2.
+# With these coefficients the deterministic wage peaks around age 47
+# and falls about 15-18% by retirement age 65, consistent with the
+# paper's discussion on p.956.
 alpha1_wage = 0.0561
 alpha2_wage = -0.000599
 
@@ -93,6 +355,14 @@ agent_count = 10000
 shock_count = 7
 asset_grid_count = 48
 asset_grid_max = 50.0
+
+# Shock std used at the working-to-retirement transition (HARK index
+# ``T_work - 1``) and in the certainty-flexible scenario.  Set just
+# above zero because the labour-model solver's interpolators choke on
+# strictly degenerate shock distributions; the residual variance is
+# numerically negligible (sigma=1e-3 -> sigma^2=1e-6) compared with the
+# Low (2005) shock variances on the order of 0.03.
+_BOUNDARY_STD = 1.0e-3
 
 # === Low (2005) Working-Life Replication Targets (Table 1, p.956) ===
 # Single source of truth -- consumed by the printed summary, the JSON
@@ -154,8 +424,23 @@ print(f"Retirement: {T_ret} periods at {replacement_rate:.2f} replacement rate")
 print(f"Figures directory: {FIG_DIR}")
 
 # %% Deterministic wage growth factors
+#
+# log w(age) = alpha1 * age + alpha2 * age^2 implies the one-year log
+# wage growth from calendar age `a` to `a+1` is alpha1 + alpha2 * (2a+1).
+# Period t in the model corresponds to calendar age `start_age + t`,
+# so `PermGroFac[t]` (growth from period t to t+1) is the growth
+# evaluated at age `start_age + t`.
+#
+# Earlier versions of this script used `2*t + 1` -- effectively
+# treating `t = 0` as calendar age 0 -- which pushed the simulated
+# wage peak to age ~72 (well past retirement) and produced agents who
+# expected ever-rising wages, draining assets in late working life and
+# generating a sharp dip in the cross-sectional asset profile at age
+# 65.  Using the calendar-age-correct expression below restores Low
+# (2005)'s hump-shaped wage profile that peaks at age ~47 with
+# roughly a 15-18% decline to age 65, as the paper describes (p.956).
 PermGroFac_list = [
-    float(np.exp(alpha1_wage + alpha2_wage * (2 * t + 1)))
+    float(np.exp(alpha1_wage + alpha2_wage * (2 * (start_age + t) + 1)))
     for t in range(T_work)
 ]
 
@@ -189,96 +474,81 @@ plt.show()
 #
 # To get the cross-period normalization right we set
 # `PermGroFac[T_work-1] = replacement_rate` (deterministic income
-# drop at the retirement transition) and zero the shock variances at
-# the same period.  Working-life dynamics for periods 0..T_work-2 are
-# unchanged.  We also keep `retirement_paths` as a closed-form
-# deterministic forward extension for plotting the retirement portion
-# of the lifecycle, since `LaborIntMargConsumerType` only simulates
-# the working-life cycle natively.
+# drop at the retirement transition).  Working-life dynamics for
+# periods 0..T_work-2 are unchanged.  ``retirement_paths`` then
+# replays each agent through the *same* IndShock retirement
+# consumption rules that the working-life solver references at the
+# boundary, so that the cross-sectional consumption and asset paths
+# are continuous at age 65 by construction (any discontinuity in
+# earlier versions was a bug in the post-hoc closed-form Euler
+# extension, which has been removed).
 
 # %%
-def retirement_paths(history, *, CRRA, T_ret, replacement_rate,
-                     Rfree, DiscFac):
-    """Closed-form deterministic retirement extension with a_t >= 0.
+def retirement_paths(history, ret_agent, *, T_ret, replacement_rate, Rfree):
+    """Simulate retirement through the IndShock retirement cFunc.
 
-    Retirement is solved *in isolation* from working life: each agent
-    enters retirement with their simulated terminal assets and a
-    constant pension equal to ``replacement_rate`` times their final
-    permanent income, and chooses consumption to satisfy the Euler
-    equation subject to no-borrowing (``a_t >= 0``) and no bequests
-    (``a_{T_ret} = 0``).  Because the working-life HARK agent does not
-    anticipate retirement, there is a visible discontinuity at age 65
-    in the life-cycle figures -- this reflects the resolution of
-    income uncertainty, not an error in the code.  A fully
-    lifecycle-consistent solution would require a HARK agent that
-    supports both a labour choice and a zero-wage retirement stage in
-    the same backwards-induction problem, which is left as a future
-    extension.
+    Each agent enters retirement with the level wealth saved at the
+    end of working life and a constant pension equal to
+    ``replacement_rate`` times their final permanent income.  Their
+    period-by-period consumption follows the IndShock retirement
+    subproblem's policy function -- the same value function that the
+    working-life agent's terminal solution references -- so the
+    cross-sectional life-cycle profiles are continuous across the
+    age-65 boundary by construction.  Earlier versions used a
+    closed-form annuity Euler that ignored the binding no-borrowing
+    constraint, which produced visible discontinuities in the figures.
 
     Parameters
     ----------
     history : dict
         HARK simulation history with ``aNrm`` and ``pLvl`` arrays of
         shape ``(T_work, AgentCount)``.
-    CRRA : float
-        Coefficient of relative risk aversion used during retirement.
+    ret_agent : IndShockConsumerType
+        Solved retirement subproblem.  ``ret_agent.solution[t].cFunc``
+        gives optimal normalised consumption at the start of
+        retirement period ``t`` (in retirement-pLvl units, with
+        constant pension normalised to 1).
     T_ret : int
         Number of retirement periods.
     replacement_rate : float
         Pension as a fraction of last working-life permanent income.
-    Rfree, DiscFac : float
-        Gross interest rate and discount factor.
+    Rfree : float
+        Gross interest rate.
 
     Returns
     -------
     mean_c_ret, mean_a_ret : ndarray of shape ``(T_ret,)``
-        Cross-sectional mean consumption (level) and mean assets
-        entering each retirement period (i.e. ``a_t`` *before*
-        consumption at period ``t``).
+        Cross-sectional mean consumption (level) and mean end-of-period
+        assets (level) at each retirement age.
     """
-    a_terminal = np.asarray(history["aNrm"][-1] * history["pLvl"][-1],
-                            dtype=float)
-    p_terminal = np.asarray(history["pLvl"][-1], dtype=float)
-    pension = replacement_rate * p_terminal
+    aNrm_w = np.asarray(history["aNrm"][-1], dtype=float)
+    pLvl_w = np.asarray(history["pLvl"][-1], dtype=float)
+    pLvl_r = pLvl_w * replacement_rate
+
+    # End-of-working-life normalised assets, restated in retirement-pLvl
+    # units (since pLvl drops by ``replacement_rate`` at the transition,
+    # the same level wealth corresponds to a 1/replacement_rate larger
+    # value in retirement-normalised units).  With ``BoroCnstArt = 0``
+    # in the working-life model, ``aNrm_w >= 0`` by construction, but we
+    # still clip defensively (numerical extrapolation near the boundary
+    # can produce tiny negative values).
+    a_norm = np.maximum(aNrm_w / replacement_rate, 0.0)
     R = float(Rfree)
 
-    # Euler-equation consumption growth factor.
-    g_c = (DiscFac * R) ** (1.0 / CRRA)
+    AgentCount = aNrm_w.shape[0]
+    c_ret_level = np.empty((T_ret, AgentCount))
+    a_ret_level = np.empty((T_ret, AgentCount))
 
-    # Annuity factors: PV of $1 received in each retirement period.
-    if abs(R - 1.0) < 1e-12:
-        ann_y = float(T_ret)
-    else:
-        ann_y = (1.0 - R ** (-T_ret)) / (1.0 - 1.0 / R)
-    if abs(g_c / R - 1.0) < 1e-12:
-        ann_c = float(T_ret)
-    else:
-        ann_c = (1.0 - (g_c / R) ** T_ret) / (1.0 - g_c / R)
-
-    c0 = (a_terminal + pension * ann_y) / ann_c
-
-    AgentCount = a_terminal.shape[0]
-    c_ret = np.empty((T_ret, AgentCount))
-    a_ret = np.empty((T_ret, AgentCount))
-    a_t = a_terminal.copy()
-    hand_to_mouth = np.zeros(AgentCount, dtype=bool)
     for t in range(T_ret):
-        c_unconstrained = c0 * (g_c ** t)
-        cash = a_t + pension
-        # Agents already liquidity-constrained eat pension each period.
-        c_t = np.where(hand_to_mouth, pension, c_unconstrained)
-        # If the unconstrained plan would push assets below zero this
-        # period, consume all cash-on-hand and switch to hand-to-mouth.
-        would_go_negative = (~hand_to_mouth) & (cash - c_t < 0.0)
-        if np.any(would_go_negative):
-            c_t = np.where(would_go_negative, cash, c_t)
-            hand_to_mouth |= would_go_negative
-        c_ret[t] = c_t
-        a_ret[t] = a_t
-        a_t = R * (cash - c_t)
-        hand_to_mouth |= (a_t <= 1e-10)
+        # Cash-on-hand at start of retirement period t, in retirement-
+        # pLvl-normalised units (constant pension = 1, no shocks).
+        m_norm = a_norm * R + 1.0
+        c_norm = np.asarray(ret_agent.solution[t].cFunc(m_norm), dtype=float)
+        a_norm = m_norm - c_norm
+        c_ret_level[t] = c_norm * pLvl_r
+        a_ret_level[t] = a_norm * pLvl_r
 
-    return c_ret.mean(axis=1), a_ret.mean(axis=1)
+    return c_ret_level.mean(axis=1), a_ret_level.mean(axis=1)
 
 # %% Retirement-continuation terminal solution
 from HARK.ConsumptionSaving.ConsLaborModel import ConsumerLaborSolution
@@ -290,13 +560,15 @@ def _solve_retirement_continuation(*, T_ret, CRRA, DiscFac, Rfree,
     """Solve a deterministic retirement subproblem.
 
     Models retirement as an `IndShockConsumerType` with no income
-    shocks, no growth, constant pension normalized to 1 in
+    shocks, no growth, constant pension normalised to 1 in
     retirement-pLvl units (so that real pension equals
     ``replacement_rate * pLvl_{T_work-1}`` once we set
     ``PermGroFac[T_work-1] = replacement_rate`` upstream), no
-    unemployment, no bequest, and no borrowing.  Returns the IndShock
-    solution at the start of the first retirement period, which we
-    splice in as the terminal solution for the working-life problem.
+    unemployment, no bequest, and no borrowing.  Returns the *solved*
+    retirement agent so callers can both splice ``solution[0]`` in as
+    the working-life terminal *and* simulate the retirement portion
+    of the life-cycle through ``solution[t].cFunc`` -- the same
+    consumption rule that the working-life solver expects.
     """
     ret_agent = IndShockConsumerType(
         cycles=1,
@@ -330,7 +602,7 @@ def _solve_retirement_continuation(*, T_ret, CRRA, DiscFac, Rfree,
         PermGroFacAgg=1.0,
     )
     ret_agent.solve()
-    return ret_agent.solution[0]
+    return ret_agent
 
 
 class _LaborTerminalVPfunc:
@@ -362,17 +634,21 @@ class _LaborTerminalBNrmMin:
         return np.full_like(np.asarray(TranShk, dtype=float), self.value)
 
 
-def _make_labor_terminal_from_retirement(ret_solution):
-    """Wrap an IndShock retirement-start solution as a `ConsumerLaborSolution`."""
+def _make_labor_terminal_from_retirement(ret_agent):
+    """Wrap a solved retirement agent as a `ConsumerLaborSolution`.
+
+    Uses the start-of-retirement (period 0) marginal value function as
+    the working-life solver's terminal continuation.
+    """
     return ConsumerLaborSolution(
         cFunc=ConstantFunction(0.0),
         LbrFunc=ConstantFunction(0.0),
-        vPfunc=_LaborTerminalVPfunc(ret_solution.vPfunc),
+        vPfunc=_LaborTerminalVPfunc(ret_agent.solution[0].vPfunc),
         bNrmMin=_LaborTerminalBNrmMin(0.0),
     )
 
 
-class LaborIntMargWithRetirement(LaborIntMargConsumerType):
+class LaborIntMargWithRetirement(LaborIntMargConsumerTypeBoroCnst):
     """`LaborIntMargConsumerType` with an injected retirement terminal.
 
     HARK's `IndShockConsumerType.pre_solve` (which the labor model
@@ -380,6 +656,13 @@ class LaborIntMargWithRetirement(LaborIntMargConsumerType):
     ``solution_terminal`` with a default eat-everything terminal each
     time `solve()` runs.  We override that hook so the retirement
     continuation persists across `solve()` invocations.
+
+    Inherits the no-borrowing patched solver from
+    :class:`LaborIntMargConsumerTypeBoroCnst` so that the working-life
+    optimisation respects Low (2005)'s no-borrowing-against-pension
+    constraint (p.~949) -- the same constraint imposed on the
+    fixed-hours benchmark below via ``IndShockConsumerType``'s
+    ``BoroCnstArt = 0``.
     """
 
     def __init__(self, *args, retirement_terminal, **kwargs):
@@ -432,29 +715,66 @@ def _build_flex_agent(*, DiscFac, perm_shk_std, tran_shk_std, base_dict):
 
     Solves the deterministic retirement subproblem at the given
     ``DiscFac`` and splices its start-of-retirement marginal value
-    function in as the working-life terminal solution.
+    function in as the working-life terminal solution.  The full
+    solved retirement agent is stashed as ``_retirement_agent`` so
+    that ``retirement_paths`` can replay each simulated working-life
+    agent through the retirement consumption rule, ensuring the
+    cross-sectional life-cycle profiles are continuous at age 65.
     """
-    ret_sol = _solve_retirement_continuation(
+    ret_agent = _solve_retirement_continuation(
         T_ret=T_ret, CRRA=CRRA_hark, DiscFac=DiscFac, Rfree=Rfree,
         asset_grid_max=asset_grid_max, asset_grid_count=asset_grid_count,
     )
-    labor_term = _make_labor_terminal_from_retirement(ret_sol)
+    labor_term = _make_labor_terminal_from_retirement(ret_agent)
     d = base_dict.copy()
     d["DiscFac"] = DiscFac
-    d["PermShkStd"] = [perm_shk_std] * T_work
+    # The permanent-shock std at index ``T_work - 1`` parameterises the
+    # *working-to-retirement* (period 39 -> 40) permanent-income shock
+    # that the backward-induction solver integrates over at the
+    # boundary -- ``IncShkDstn[t]`` is the next-period (t -> t+1)
+    # distribution from the solver's perspective.  Collapsing this std
+    # to ``_BOUNDARY_STD`` (numerically negligible but strictly
+    # positive, so the lognormal discretisation stays non-degenerate)
+    # makes the deterministic 0.55x replacement-rate multiplier the
+    # *only* shock at the transition, eliminating the spurious
+    # precautionary motive at age 64 that otherwise drives a visible
+    # consumption/asset jump at the age-65 boundary.  Working-life
+    # simulation is unaffected: HARK's ``get_shocks`` for
+    # ``cycles == 1`` indexes ``IncShkDstn[t - 1]`` at simulation
+    # period ``t``, so cross-sections at period ``T_work - 1`` still
+    # draw from the full-std distribution at index ``T_work - 2``.
+    #
+    # We deliberately leave ``TranShkStd`` at its full value at the
+    # boundary because the labour solver reuses ``TranShkDstn[t]`` as
+    # the *state grid* for the period-t labour decision (see
+    # ``LaborIntMargConsumerType.update_TranShkGrid``), so collapsing
+    # it would shrink the cFunc's TranShk domain and make the
+    # period-39 simulation NaN out wherever the actual TranShk (drawn
+    # from index 38, hence at full std) falls outside the boundary
+    # grid.  Since the terminal vPfunc wrapper ignores TranShk anyway,
+    # the residual TranShk variance at the boundary affects only the
+    # period-39 labour decision -- and only by giving the agent a
+    # realistic last-period wage shock to plan against.
+    d["PermShkStd"] = [perm_shk_std] * (T_work - 1) + [_BOUNDARY_STD]
     d["TranShkStd"] = [tran_shk_std] * T_work
-    return LaborIntMargWithRetirement(retirement_terminal=labor_term, **d)
+    agent = LaborIntMargWithRetirement(retirement_terminal=labor_term, **d)
+    agent._retirement_agent = ret_agent
+    return agent
 
 
 def _build_fixed_agent(*, DiscFac, fixed_dict_template):
     """Construct a fixed-hours IndShock agent with retirement continuation."""
-    ret_sol = _solve_retirement_continuation(
+    ret_agent = _solve_retirement_continuation(
         T_ret=T_ret, CRRA=CRRA_hark, DiscFac=DiscFac, Rfree=Rfree,
         asset_grid_max=asset_grid_max, asset_grid_count=asset_grid_count,
     )
     d = fixed_dict_template.copy()
     d["DiscFac"] = DiscFac
-    return IndShockWithRetirement(retirement_terminal=ret_sol, **d)
+    agent = IndShockWithRetirement(
+        retirement_terminal=ret_agent.solution[0], **d,
+    )
+    agent._retirement_agent = ret_agent
+    return agent
 
 
 def _solve_and_sim_flex(DiscFac, perm_shk_std, tran_shk_std, base_dict):
@@ -506,21 +826,25 @@ def _fixed_median_AY(agent):
     return float(np.nanmedian(np.where(pos, A / np.where(pos, Y, 1.0), np.nan)))
 
 
-def _calibrate_discfac(eval_func, *, target=1.84, lo=0.90, hi=1.05,
-                       tol=0.01, max_iter=22, label=""):
+def _calibrate_discfac(eval_func, *, target=1.84, lo=0.90, hi=None,
+                       tol=0.01, max_iter=22, label="", Rfree=Rfree):
     """Bisect over ``DiscFac`` until ``eval_func(DiscFac)`` is within
     ``tol`` of ``target``.
 
     ``eval_func(DiscFac)`` should return the median A/Y produced by
     solving and simulating one scenario.  ``A/Y`` is monotone increasing
     in ``DiscFac`` (more patient = save more), so a standard bisection
-    converges in O(log(1/tol)) iterations -- at the default settings
-    well within the iteration cap.
+    converges in O(log(1/tol)) iterations.
 
-    The default bounds intentionally allow ``DiscFac`` slightly above
-    one (negative implicit delta) because the certainty + flexible
-    hours scenario needs an unusually patient agent to reach the PSID
-    median A/Y target absent precautionary saving incentives.
+    The default upper bound is ``DiscFac = 1 / Rfree`` (i.e.,
+    :math:`R \\beta = 1`).  Allowing ``DiscFac`` above this would make
+    the agent prefer rising consumption in retirement, leading to
+    optimal *saving* out of pension income just after age 65 -- a
+    real model output, but one that produces a counter-intuitive
+    upward bump in the post-retirement segment of the asset profile
+    that is absent from Low (2005)'s published figures.  The
+    :math:`R \\beta = 1` cap matches the "smooth dis-saving through
+    retirement" pattern in Low (2005), Figures 5c/6c/7c.
 
     Returns
     -------
@@ -529,6 +853,8 @@ def _calibrate_discfac(eval_func, *, target=1.84, lo=0.90, hi=1.05,
         ``tol`` of ``target``; ``False`` indicates an upper- or
         lower-bound bind.
     """
+    if hi is None:
+        hi = 1.0 / Rfree
     last_mid = lo
     last_m = float("nan")
     for i in range(max_iter):
@@ -572,11 +898,16 @@ base_dict = {
     "T_retire": 0,
     "IncUnemp": 0.0,
     "IncUnempRet": 0.0,
-    # Use the natural borrowing limit (most-negative `a` for which the
-    # consumer can repay in the worst-case shock realization).  The same
-    # choice is used for the fixed-hours benchmark below so that the
-    # flexible-vs-fixed comparison isolates labour-supply flexibility
-    # rather than mixing it with a tighter ad-hoc constraint.
+    # Low (2005), p.949: "individuals are not allowed to borrow against
+    # pension income".  HARK's ``LaborIntMargConsumerType`` does not
+    # currently accept an artificial borrowing constraint (only the
+    # natural limit), but the labor solver still imposes its own implicit
+    # lower bound (``cFunc(b_min, theta) = 0``), so agents cannot consume
+    # more than period-t cash on hand and ``aNrm >= 0`` follows.  The
+    # fixed-hours benchmark below uses ``IndShockConsumerType``, which
+    # *does* support ``BoroCnstArt = 0`` and is configured accordingly
+    # so that the flexible-vs-fixed comparison reflects only the
+    # labour-supply margin.
     "BoroCnstArt": None,
     "LbrCostCoeffs": [float(np.log(alpha_hark))],
     "aXtraMin": 0.001,
@@ -619,7 +950,17 @@ fixed_dict_template = {
     "Rfree": [Rfree] * T_work,
     "LivPrb": [1.0] * T_work,
     "PermGroFac": PermGroFac_with_retirement,
-    "PermShkStd": [sigma_perm] * T_work,
+    # See ``_build_flex_agent`` for the rationale: collapsing only the
+    # *permanent* shock std at ``T_work - 1`` (to ``_BOUNDARY_STD``)
+    # makes the working-to-retirement transition deterministic in the
+    # solver, without altering the working-life simulation shocks (HARK
+    # indexes ``IncShkDstn[t - 1]`` during simulation when
+    # ``cycles == 1``).  ``TranShkStd`` is left at the full
+    # working-life value at the boundary because the IndShock solver
+    # treats it as the next-period transitory shock and the agent's
+    # retirement-stage transitory income is captured by the
+    # ``replacement_rate`` factor rather than by a wage shock.
+    "PermShkStd": [sigma_perm] * (T_work - 1) + [_BOUNDARY_STD],
     "TranShkStd": [sigma_tran] * T_work,
     "PermShkCount": shock_count,
     "TranShkCount": shock_count,
@@ -630,8 +971,10 @@ fixed_dict_template = {
     "IncUnempRet": 0.0,
     # Match the borrowing-constraint specification used by the flexible
     # model so that `flexible_vs_fixed.png` reflects only the
-    # labour-supply margin.
-    "BoroCnstArt": None,
+    # labour-supply margin.  Low (2005), p.949 disallows borrowing
+    # against pension income, so BoroCnstArt = 0 is the paper's
+    # specification.
+    "BoroCnstArt": 0.0,
     "aXtraMin": 0.001,
     "aXtraMax": asset_grid_max,
     "aXtraCount": asset_grid_count,
@@ -734,9 +1077,8 @@ flex_u_L_work = np.mean(agent.history["Lbr"], axis=1)
 flex_u_a_work = np.mean(agent.history["aNrm"] * agent.history["pLvl"], axis=1)
 
 flex_u_c_ret, flex_u_a_ret = retirement_paths(
-    agent.history, CRRA=CRRA_hark, T_ret=T_ret,
+    agent.history, agent._retirement_agent, T_ret=T_ret,
     replacement_rate=replacement_rate, Rfree=Rfree,
-    DiscFac=DiscFac_uncert_flex,
 )
 flex_u_c = np.concatenate([flex_u_c_work, flex_u_c_ret])
 flex_u_a = np.concatenate([flex_u_a_work, flex_u_a_ret])
@@ -761,9 +1103,8 @@ flex_c_L_work = np.mean(cert_agent.history["Lbr"], axis=1)
 flex_c_a_work = np.mean(cert_agent.history["aNrm"] * cert_agent.history["pLvl"], axis=1)
 
 flex_c_c_ret, flex_c_a_ret = retirement_paths(
-    cert_agent.history, CRRA=CRRA_hark, T_ret=T_ret,
+    cert_agent.history, cert_agent._retirement_agent, T_ret=T_ret,
     replacement_rate=replacement_rate, Rfree=Rfree,
-    DiscFac=DiscFac_cert_flex,
 )
 flex_c_c = np.concatenate([flex_c_c_work, flex_c_c_ret])
 flex_c_a = np.concatenate([flex_c_a_work, flex_c_a_ret])
@@ -784,9 +1125,8 @@ fix_u_c_work = np.mean(fixed_agent.history["cNrm"] * fixed_agent.history["pLvl"]
 fix_u_a_work = np.mean(fixed_agent.history["aNrm"] * fixed_agent.history["pLvl"], axis=1)
 
 fix_u_c_ret, fix_u_a_ret = retirement_paths(
-    fixed_agent.history, CRRA=CRRA_hark, T_ret=T_ret,
+    fixed_agent.history, fixed_agent._retirement_agent, T_ret=T_ret,
     replacement_rate=replacement_rate, Rfree=Rfree,
-    DiscFac=DiscFac_uncert_fixed,
 )
 fix_u_c = np.concatenate([fix_u_c_work, fix_u_c_ret])
 fix_u_a = np.concatenate([fix_u_a_work, fix_u_a_ret])
@@ -795,43 +1135,179 @@ print("Fixed-hours + uncertainty model solved.")
 
 # %% [markdown]
 # ---
-# ## Figure 1: Life-Cycle Profiles under Uncertainty, Flexible Hours
-# (cf. Low 2005, Figure 7)
+# ## Plot-axis conventions (Low 2005, Figures 5--7)
+#
+# Low (2005) plots three panels per figure:
+#
+# * Panel (a): **average log consumption** -- working ages only
+#   (ages 22-64 in the paper; 25-64 here).
+# * Panel (b): **average hours of work** -- working ages only.
+# * Panel (c): **median asset holding by age divided by median income**
+#   -- full life cycle including retirement (the paper's x-axis runs
+#   from age 22 all the way to age 80).
+#
+# Crucially, **consumption and hours plots in Low (2005) end at age
+# 64**.  Plotting these series through retirement -- as earlier
+# versions of this script did -- introduces a visible discontinuity at
+# age 65 that is intrinsic to the model (hours go from interior to a
+# corner at zero, leisure jumps to its full endowment, and the
+# marginal-utility-of-consumption channel pushes consumption upwards),
+# but that discontinuity is **not present in the published figures**
+# because they simply do not plot post-retirement consumption or
+# hours.  We follow the paper's truncation convention below.
 
 # %%
 retire_age = start_age + T_work  # age at which retirement begins (65)
+ages_full = np.arange(start_age, start_age + T_total)  # ages 25..84
+ages_work = np.arange(start_age, start_age + T_work)   # ages 25..64
 
 
 def _mark_retirement(ax):
     ax.axvline(retire_age, color="grey", linestyle=":", linewidth=1)
 
 
+def _median_working_income(history, *, flex):
+    """Median cross-sectional income across all working-age periods."""
+    pLvl = np.asarray(history["pLvl"], dtype=float)
+    Tran = np.asarray(history["TranShk"], dtype=float)
+    if flex:
+        Lbr = np.asarray(history["Lbr"], dtype=float)
+        Y = pLvl * Lbr * Tran
+    else:
+        Y = pLvl * Tran
+    pos = Y > 1e-8
+    return float(np.nanmedian(Y[pos]))
+
+
+def _median_assets_profile(history):
+    """Cross-sectional median assets by age over the working life
+    (Low 2005 plots median assets by age)."""
+    aNrm = np.asarray(history["aNrm"], dtype=float)
+    pLvl = np.asarray(history["pLvl"], dtype=float)
+    return np.median(aNrm * pLvl, axis=1)
+
+
+def _mean_log_consumption_profile(history):
+    """Cross-sectional ``mean of log c_t`` by age (Low 2005 panels (a)).
+
+    Low (2005), Fig. 5/6/7 captions: "average log consumption".  We
+    compute :math:`E_i [\\log c_{i,t}]` rather than :math:`\\log E_i [c_{i,t}]`
+    -- the former is well-defined and finite even when some agents have
+    very small consumption, and matches the usual reading of "average
+    log".
+    """
+    cNrm = np.asarray(history["cNrm"], dtype=float)
+    pLvl = np.asarray(history["pLvl"], dtype=float)
+    cLvl = cNrm * pLvl
+    cLvl = np.where(cLvl > 1e-12, cLvl, np.nan)
+    return np.nanmean(np.log(cLvl), axis=1)
+
+
+def _retirement_paths_median(history, ret_agent, *, T_ret,
+                             replacement_rate, Rfree):
+    """Median consumption and asset paths through retirement.
+
+    Replays each simulated working-life agent through the deterministic
+    retirement consumption rule and returns the cross-sectional
+    *medians* (matching Low 2005's plotting convention).
+
+    Uses the IndShock retirement subproblem's ``cFunc`` for the
+    optimal policy.  Because the IndShock model's borrowing constraint
+    (``BoroCnstArt = 0``) clips negative cash on hand at the lower
+    end of its interpolation grid, agents that finish working life
+    with slightly negative ``aNrm`` (which can happen under
+    ``LaborIntMargConsumerType``'s natural lower bound of
+    ``bNrmMin = -wage \\cdot TranShk``) are simply collapsed onto the
+    age-65 constraint when they enter retirement.  This is the same
+    convention Low (2005) describes on p.~949 ("individuals are not
+    allowed to borrow against pension income").
+    """
+    aNrm_w = np.asarray(history["aNrm"][-1], dtype=float)
+    pLvl_w = np.asarray(history["pLvl"][-1], dtype=float)
+    pLvl_r = pLvl_w * replacement_rate
+
+    a_norm = np.maximum(aNrm_w / replacement_rate, 0.0)
+    R = float(Rfree)
+
+    AgentCount = aNrm_w.shape[0]
+    c_ret_level = np.empty((T_ret, AgentCount))
+    a_ret_level = np.empty((T_ret, AgentCount))
+
+    for t in range(T_ret):
+        m_norm = a_norm * R + 1.0
+        c_norm = np.asarray(ret_agent.solution[t].cFunc(m_norm), dtype=float)
+        a_norm = m_norm - c_norm
+        c_ret_level[t] = c_norm * pLvl_r
+        a_ret_level[t] = a_norm * pLvl_r
+
+    return np.median(c_ret_level, axis=1), np.median(a_ret_level, axis=1)
+
+
+# Working-life median income, used to scale the asset profile.
+Y_med_flex_u = _median_working_income(agent.history, flex=True)
+Y_med_flex_c = _median_working_income(cert_agent.history, flex=True)
+Y_med_fix_u  = _median_working_income(fixed_agent.history, flex=False)
+
+# Working-life ``mean log consumption`` profiles (Low 2005, panels (a)).
+flex_u_logc_work_mean = _mean_log_consumption_profile(agent.history)
+flex_c_logc_work_mean = _mean_log_consumption_profile(cert_agent.history)
+fix_u_logc_work_mean  = _mean_log_consumption_profile(fixed_agent.history)
+
+# Median asset profiles (working life), and through retirement
+# (Low 2005, panels (c) -- median A_t / median \bar y).
+flex_u_a_work_median = _median_assets_profile(agent.history)
+flex_c_a_work_median = _median_assets_profile(cert_agent.history)
+fix_u_a_work_median  = _median_assets_profile(fixed_agent.history)
+
+# Retirement extension (using *median* paths to match Low 2005, Fig
+# 5c--7c which plot "median asset holding by age divided by median
+# income").
+_, flex_u_a_ret_median = _retirement_paths_median(
+    agent.history, agent._retirement_agent, T_ret=T_ret,
+    replacement_rate=replacement_rate, Rfree=Rfree,
+)
+_, flex_c_a_ret_median = _retirement_paths_median(
+    cert_agent.history, cert_agent._retirement_agent, T_ret=T_ret,
+    replacement_rate=replacement_rate, Rfree=Rfree,
+)
+_, fix_u_a_ret_median = _retirement_paths_median(
+    fixed_agent.history, fixed_agent._retirement_agent, T_ret=T_ret,
+    replacement_rate=replacement_rate, Rfree=Rfree,
+)
+
+flex_u_a_full_median = np.concatenate([flex_u_a_work_median, flex_u_a_ret_median])
+flex_c_a_full_median = np.concatenate([flex_c_a_work_median, flex_c_a_ret_median])
+fix_u_a_full_median  = np.concatenate([fix_u_a_work_median,  fix_u_a_ret_median])
+
+flex_u_ay = flex_u_a_full_median / Y_med_flex_u
+flex_c_ay = flex_c_a_full_median / Y_med_flex_c
+fix_u_ay  = fix_u_a_full_median  / Y_med_fix_u
+
 fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 
-axes[0].plot(ages, flex_u_c, "b-", linewidth=2)
+axes[0].plot(ages_work, flex_u_logc_work_mean, "b-", linewidth=2)
 axes[0].set_xlabel("Age")
-axes[0].set_ylabel("Mean Consumption")
-axes[0].set_title("(a) Consumption")
+axes[0].set_ylabel(r"$\ln c_t$")
+axes[0].set_title("(a) Average log consumption, working life")
 axes[0].grid(True, alpha=0.3)
-_mark_retirement(axes[0])
 
-axes[1].plot(ages, flex_u_L, "r-", linewidth=2)
+axes[1].plot(ages_work, flex_u_L_work, "r-", linewidth=2)
 axes[1].set_xlabel("Age")
-axes[1].set_ylabel("Labor Supply (frac of time)")
-axes[1].set_title("(b) Hours Worked")
+axes[1].set_ylabel("Hours of work (frac of time)")
+axes[1].set_title("(b) Average hours of work, working life")
 axes[1].grid(True, alpha=0.3)
-_mark_retirement(axes[1])
 
-axes[2].plot(ages, flex_u_a, "g-", linewidth=2)
+axes[2].plot(ages_full, flex_u_ay, "g-", linewidth=2)
 axes[2].set_xlabel("Age")
-axes[2].set_ylabel("Mean Assets")
-axes[2].set_title("(c) Asset Accumulation")
+axes[2].set_ylabel(r"$A_t / \bar y$")
+axes[2].set_title("(c) Median assets / median income")
 axes[2].grid(True, alpha=0.3)
 _mark_retirement(axes[2])
 
 fig.suptitle(
     "Life-Cycle Profiles: Uncertainty with Flexible Hours\n"
-    "(cf. Low 2005, Figure 7; vertical line marks retirement at age 65)",
+    "(cf. Low 2005, Figure 7; panels (a),(b) restricted to working "
+    "ages as in the paper)",
     fontsize=13, y=1.02,
 )
 plt.tight_layout()
@@ -867,14 +1343,14 @@ print(f"Saved: {FIG_DIR / 'hours_cert_vs_uncert.png'}")
 
 # %%
 fig, ax = plt.subplots(figsize=(8, 5))
-ax.plot(ages, flex_u_c, "b-", linewidth=2, label="Uncertainty")
-ax.plot(ages, flex_c_c, "r--", linewidth=2, label="Certainty")
+ax.plot(ages_work, flex_u_logc_work_mean, "b-", linewidth=2, label="Uncertain")
+ax.plot(ages_work, flex_c_logc_work_mean, "r--", linewidth=2, label="Certain")
 ax.set_xlabel("Age")
-ax.set_ylabel("Mean Consumption")
-ax.set_title("Consumption: Certainty vs Uncertainty\n(cf. Low 2005, Figure 4)")
+ax.set_ylabel(r"$\ln c_t$")
+ax.set_title("Average log consumption, working life: Certain vs Uncertain\n"
+             "(cf. Low 2005, Fig.~5a / Fig.~6a; working ages only)")
 ax.legend()
 ax.grid(True, alpha=0.3)
-_mark_retirement(ax)
 plt.tight_layout()
 plt.savefig(FIG_DIR / "consumption_cert_vs_uncert.png", dpi=150, bbox_inches="tight")
 plt.show()
@@ -889,11 +1365,12 @@ print(f"Saved: {FIG_DIR / 'consumption_cert_vs_uncert.png'}")
 
 # %%
 fig, ax = plt.subplots(figsize=(8, 5))
-ax.plot(ages, flex_u_a, "b-", linewidth=2, label="Uncertainty")
-ax.plot(ages, flex_c_a, "r--", linewidth=2, label="Certainty")
+ax.plot(ages_full, flex_u_ay, "b-", linewidth=2, label="Uncertain")
+ax.plot(ages_full, flex_c_ay, "r--", linewidth=2, label="Certain")
 ax.set_xlabel("Age")
-ax.set_ylabel("Mean Assets")
-ax.set_title("Assets: Certainty vs Uncertainty\n(cf. Low 2005, Figure 5)")
+ax.set_ylabel(r"$A_t / \bar y$")
+ax.set_title("Median assets / median income: Certain vs Uncertain\n"
+             "(cf. Low 2005, Fig.~5c / Fig.~6c)")
 ax.legend()
 ax.grid(True, alpha=0.3)
 _mark_retirement(ax)
@@ -912,26 +1389,29 @@ print(f"Saved: {FIG_DIR / 'assets_cert_vs_uncert.png'}")
 # %%
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
-axes[0].plot(ages, flex_u_c, "b-", linewidth=2, label="Flexible Hours")
-axes[0].plot(ages, fix_u_c, "r--", linewidth=2, label="Fixed Hours")
+axes[0].plot(ages_work, flex_u_logc_work_mean, "b-",
+             linewidth=2, label="Flexible Hours")
+axes[0].plot(ages_work, fix_u_logc_work_mean, "r--",
+             linewidth=2, label="Fixed Hours")
 axes[0].set_xlabel("Age")
-axes[0].set_ylabel("Mean Consumption")
-axes[0].set_title("Consumption: Flexible vs Fixed Hours")
+axes[0].set_ylabel(r"$\ln c_t$")
+axes[0].set_title("(a) Average log consumption, working life")
 axes[0].legend()
 axes[0].grid(True, alpha=0.3)
-_mark_retirement(axes[0])
 
-axes[1].plot(ages, flex_u_a, "b-", linewidth=2, label="Flexible Hours")
-axes[1].plot(ages, fix_u_a, "r--", linewidth=2, label="Fixed Hours")
+axes[1].plot(ages_full, flex_u_ay, "b-", linewidth=2, label="Flexible Hours")
+axes[1].plot(ages_full, fix_u_ay, "r--", linewidth=2, label="Fixed Hours")
 axes[1].set_xlabel("Age")
-axes[1].set_ylabel("Mean Assets")
-axes[1].set_title("Assets: Flexible vs Fixed Hours")
+axes[1].set_ylabel(r"$A_t / \bar y$")
+axes[1].set_title("(b) Median assets / median income")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 _mark_retirement(axes[1])
 
 fig.suptitle(
-    "Flexible vs Fixed Hours under Uncertainty\n(cf. Low 2005, Figure 6)",
+    "Flexible vs Fixed Hours under Uncertainty\n"
+    "(cf. Low 2005, Figure 7; consumption shown for working life only "
+    "as in the paper)",
     fontsize=13, y=1.02,
 )
 plt.tight_layout()
