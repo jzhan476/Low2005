@@ -281,7 +281,7 @@ agent = LaborIntMargConsumerType(**uncert_dict)
 agent.solve()
 print(f"Flexible-hours + uncertainty model solved ({T_work} periods).")
 
-agent.track_vars = ["cNrm", "Lbr", "aNrm", "pLvl"]
+agent.track_vars = ["cNrm", "Lbr", "aNrm", "pLvl", "TranShk"]
 agent.initialize_sim()
 agent.simulate()
 
@@ -546,26 +546,112 @@ print(f"Saved: {FIG_DIR / 'flexible_vs_fixed.png'}")
 #
 # Comparison with Low (2005) Table 1 calibration targets:
 # - Mean hours share (working age): ~0.40
+# - Peak assets age (full life cycle): ~60
 # - Median assets/income ratio (working age): 1.84
 # - Aggregate assets/income ratio (working age): 2.14
 
 # %%
-print("\n" + "=" * 60)
+# Cross-sectional working-life A/Y (flexible-hours, uncertainty model).
+# Income at (i,t) = pLvl_{i,t} * Lbr_{i,t} * WageRte * TranShk_{i,t}
+# (WageRte = 1 in this calibration). Assets use the same convention as
+# the figures: aNrm * pLvl in level units.
+_pLvl_w = np.asarray(agent.history["pLvl"], dtype=float)
+_Lbr_w = np.asarray(agent.history["Lbr"], dtype=float)
+_TranShk_w = np.asarray(agent.history["TranShk"], dtype=float)
+_aNrm_w = np.asarray(agent.history["aNrm"], dtype=float)
+
+_income_w = _pLvl_w * _Lbr_w * _TranShk_w   # shape (T_work, AgentCount)
+_assets_w = _aNrm_w * _pLvl_w
+_pos = _income_w > 1e-8
+_AY_pointwise = np.where(_pos, _assets_w / np.where(_pos, _income_w, 1.0), np.nan)
+
+median_AY_working = float(np.nanmedian(_AY_pointwise))
+aggregate_AY_working = float(_assets_w.sum() / _income_w[_pos].sum())
+
+mean_hours = float(np.mean(flex_u_L_work))
+peak_assets_age = int(ages[np.argmax(flex_u_a)])
+mean_cons = float(np.mean(flex_u_c_work))
+
+# Qualitative comparisons (uncertainty vs certainty; flexible vs fixed).
+hours_age25_uncert = float(flex_u_L_work[0])
+hours_age25_cert = float(flex_c_L_work[0])
+peak_assets_uncert = float(np.max(flex_u_a))
+peak_assets_cert = float(np.max(flex_c_a))
+peak_assets_fixed = float(np.max(fix_u_a))
+
+print("\n" + "=" * 64)
 print("Summary: Replication vs Low (2005) Targets")
-print("=" * 60)
-print(f"{'Statistic':<40} {'Model':>10} {'Target':>10}")
-print("-" * 60)
-print(f"{'Mean hours (working, frac of time)':<40} "
-      f"{np.mean(flex_u_L_work):.4f}     {'0.40':>5}")
-print(f"{'Peak assets age (full life cycle)':<40} "
-      f"{ages[np.argmax(flex_u_a)]:>5d}     {'~60':>5}")
-print(f"{'Mean consumption (working)':<40} "
-      f"{np.mean(flex_u_c_work):.4f}     {'--':>5}")
-print("=" * 60)
-print("\nKey qualitative results:")
+print("=" * 64)
+print(f"{'Statistic':<44} {'Model':>9} {'Target':>9}")
+print("-" * 64)
+print(f"{'Mean hours (working, frac of time)':<44} "
+      f"{mean_hours:>9.4f} {'0.40':>9}")
+print(f"{'Peak assets age (full life cycle)':<44} "
+      f"{peak_assets_age:>9d} {'~60':>9}")
+print(f"{'Median A/Y, working life':<44} "
+      f"{median_AY_working:>9.2f} {'1.84':>9}")
+print(f"{'Aggregate A/Y, working life':<44} "
+      f"{aggregate_AY_working:>9.2f} {'2.14':>9}")
+print(f"{'Mean consumption (working)':<44} "
+      f"{mean_cons:>9.4f} {'--':>9}")
+print("=" * 64)
+print("\nKey qualitative results (sign should agree with Low 2005):")
 print(f"  Uncertainty raises hours early in life: "
-      f"{flex_u_L_work[0]:.3f} (uncert) vs {flex_c_L_work[0]:.3f} (cert)")
+      f"{hours_age25_uncert:.3f} (uncert) vs {hours_age25_cert:.3f} (cert)")
 print(f"  Uncertainty raises asset accumulation: "
-      f"{np.max(flex_u_a):.2f} (uncert) vs {np.max(flex_c_a):.2f} (cert)")
+      f"{peak_assets_uncert:.2f} (uncert) vs {peak_assets_cert:.2f} (cert)")
 print(f"  Flexible hours reduce precautionary saving: "
-      f"{np.max(flex_u_a):.2f} (flex) vs {np.max(fix_u_a):.2f} (fixed)")
+      f"{peak_assets_uncert:.2f} (flex) vs {peak_assets_fixed:.2f} (fixed)")
+
+# %% Persist comparison artifacts so the LaTeX paper can render the
+# replication-targets table from auto-generated content rather than
+# stale hand-typed numbers.
+import json
+
+_summary = {
+    "model": {
+        "mean_hours_working": mean_hours,
+        "peak_assets_age": peak_assets_age,
+        "median_assets_to_income_working": median_AY_working,
+        "aggregate_assets_to_income_working": aggregate_AY_working,
+        "mean_consumption_working": mean_cons,
+        "hours_age25_uncert": hours_age25_uncert,
+        "hours_age25_cert": hours_age25_cert,
+        "peak_assets_uncert_flex": peak_assets_uncert,
+        "peak_assets_cert_flex": peak_assets_cert,
+        "peak_assets_uncert_fixed": peak_assets_fixed,
+    },
+    "low_2005_target": {
+        "mean_hours_working": 0.40,
+        "peak_assets_age": 60,
+        "median_assets_to_income_working": 1.84,
+        "aggregate_assets_to_income_working": 2.14,
+    },
+    "qualitative_signs_agree_with_low_2005": {
+        "uncertainty_raises_early_hours": hours_age25_uncert > hours_age25_cert,
+        "uncertainty_raises_peak_assets": peak_assets_uncert > peak_assets_cert,
+        "flex_reduces_peak_assets": peak_assets_uncert < peak_assets_fixed,
+    },
+}
+(FIG_DIR / "replication_summary.json").write_text(
+    json.dumps(_summary, indent=2) + "\n"
+)
+print(f"Saved: {FIG_DIR / 'replication_summary.json'}")
+
+_tex_lines = [
+    "% AUTO-GENERATED by Code/Python/Low2005.py - do not edit by hand.",
+    "\\begin{tabular}{lcc}",
+    "\\toprule",
+    "Statistic (working-life cross-section) & Low (2005) target & This replication \\\\",
+    "\\midrule",
+    f"Mean hours, fraction of time worked & 0.40 & {mean_hours:.3f} \\\\",
+    f"Peak-assets age (full life cycle) & $\\sim$60 & {peak_assets_age} \\\\",
+    f"Median $A/Y$ & 1.84 & {median_AY_working:.2f} \\\\",
+    f"Aggregate $A/Y$ & 2.14 & {aggregate_AY_working:.2f} \\\\",
+    "\\bottomrule",
+    "\\end{tabular}",
+]
+(FIG_DIR / "replication_summary.tex").write_text(
+    "\n".join(_tex_lines) + "\n"
+)
+print(f"Saved: {FIG_DIR / 'replication_summary.tex'}")

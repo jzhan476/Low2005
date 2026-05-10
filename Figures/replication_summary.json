@@ -1,0 +1,25 @@
+{
+  "model": {
+    "mean_hours_working": 0.35830100133422543,
+    "peak_assets_age": 56,
+    "median_assets_to_income_working": 0.7350904492794909,
+    "aggregate_assets_to_income_working": 0.8389754618343539,
+    "mean_consumption_working": 0.9415416510509157,
+    "hours_age25_uncert": 0.43687019370945857,
+    "hours_age25_cert": 0.40514249792808305,
+    "peak_assets_uncert_flex": 1.4490470406127396,
+    "peak_assets_cert_flex": 0.16423562629296456,
+    "peak_assets_uncert_fixed": 2.85361131531733
+  },
+  "low_2005_target": {
+    "mean_hours_working": 0.4,
+    "peak_assets_age": 60,
+    "median_assets_to_income_working": 1.84,
+    "aggregate_assets_to_income_working": 2.14
+  },
+  "qualitative_signs_agree_with_low_2005": {
+    "uncertainty_raises_early_hours": true,
+    "uncertainty_raises_peak_assets": true,
+    "flex_reduces_peak_assets": true
+  }
+}
