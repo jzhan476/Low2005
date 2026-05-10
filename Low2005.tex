@@ -8,6 +8,9 @@
 \usepackage{local-qe}             % local-qe gets pkgs req for qe
 
 \bibliographystyle{plainnat}
+% Force round parentheses on natbib citations (e.g. "Low (2005)" rather
+% than the bracketed "Low [2005]" default of plainnat.bst).
+\AtBeginDocument{\setcitestyle{round}}
 
 % Load metadata BEFORE hypersetup (SST pattern)
 \input{\latexroot/@local/metadata.ltx}
@@ -92,8 +95,8 @@ comparisons. In this repository, the computational replication is implemented in
 }{}
 
 \section{Summary}
-Low (2005) studies how households self-insure over the life cycle when future wages are
-uncertain and markets are incomplete \cite{Low2005}. The paper's central point is that labour
+\citet{Low2005} studies how households self-insure over the life cycle when future wages are
+uncertain and markets are incomplete. The paper's central point is that labour
 supply is itself an insurance margin: if households can change hours worked, then they can
 respond to wage risk using both savings and labour effort rather than savings alone.
 
@@ -128,12 +131,12 @@ The key mechanism is that uncertainty affects both consumption and labour choice
 are flexible and labour supply is adjustable, the household can react to bad outcomes by
 changing hours, which lowers the utility cost of building precautionary balances. This is what
 distinguishes the model from fixed-hours precautionary-savings frameworks such as
-\cite{Deaton1991Low, GourinchasParker2002Low, Cagetti2003Low}.
+\citet{Deaton1991Low, GourinchasParker2002Low, Cagetti2003Low}.
 
 \section{Calibration and Computation}
 The paper calibrates the model at annual frequency and chooses the discount factor and the
 utility weight on leisure to match average male hours and median wealth accumulation over
-working life. The wage process moments are drawn from estimates in \cite{MeghirPistaferri2004Low},
+working life. The wage process moments are drawn from estimates in \citet{MeghirPistaferri2004Low},
 and the key baseline values reported in the paper are summarized below.
 
 \begin{table}[htbp]
@@ -324,7 +327,7 @@ how much of observed wealth is precautionary and misstates the age profiles of w
 consumption, and assets. In the calibrated simulations, flexibility leads households to borrow
 more when young, save more in middle age, and produce life-cycle labour profiles that are
 closer to the data. This is consistent with later quantitative work such as
-\cite{French2004Low}, which also benefits from modelling labour supply jointly with savings
+\citet{French2004Low}, which also benefits from modelling labour supply jointly with savings
 decisions.
 
 \pagebreak
