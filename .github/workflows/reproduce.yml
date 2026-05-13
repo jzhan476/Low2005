@@ -1,0 +1,94 @@
+name: Reproducibility
+
+# Validates that the advertised reproduction command
+#     ./reproduce.sh --comp min
+# runs end-to-end in a clean Ubuntu environment from `uv.lock`, and that the
+# five expected figures land under `Figures/`. Mirrors what a REMARK reviewer
+# would do on a clean checkout.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "REMARK.md"
+      - "Low2005.pdf"
+      - ".github/workflows/deploy-gh-pages.yml"
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "REMARK.md"
+      - "Low2005.pdf"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reproduce-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  reproduce-min:
+    name: ./reproduce.sh --comp min
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv (matches binder/environment.yml + binder/postBuild)
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: |
+            uv.lock
+            pyproject.toml
+
+      - name: Sync pinned Python dependencies (uv.lock, frozen)
+        run: uv sync --frozen --no-dev
+
+      - name: Run minimal reproduction
+        env:
+          MPLBACKEND: Agg
+        run: ./reproduce.sh --comp min
+
+      - name: Verify expected figures were produced
+        run: |
+          set -euo pipefail
+          required=(
+            lifecycle_profiles.png
+            hours_cert_vs_uncert.png
+            consumption_cert_vs_uncert.png
+            assets_cert_vs_uncert.png
+            flexible_vs_fixed.png
+          )
+          missing=0
+          for f in "${required[@]}"; do
+            if [[ ! -s "Figures/$f" ]]; then
+              echo "::error::Missing or empty figure: Figures/$f"
+              missing=$((missing + 1))
+            else
+              echo "ok  Figures/$f ($(wc -c < "Figures/$f") bytes)"
+            fi
+          done
+          if [[ $missing -gt 0 ]]; then
+            exit 1
+          fi
+          echo "All five expected figures produced."
+
+      - name: Upload figures as build artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: low2005-figures-${{ github.sha }}
+          path: Figures/*.png
+          retention-days: 30
+          if-no-files-found: warn

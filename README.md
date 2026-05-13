@@ -1,5 +1,10 @@
 # Low2005 Replication
 
+[![Reproducibility](https://github.com/jzhan476/Low2005/actions/workflows/reproduce.yml/badge.svg?branch=main)](https://github.com/jzhan476/Low2005/actions/workflows/reproduce.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
+[![Python 3.9-3.12](https://img.shields.io/badge/Python-3.9--3.12-3776AB?logo=python&logoColor=white)](./pyproject.toml)
+[![REMARK Tier 2](https://img.shields.io/badge/REMARK-Tier%202-brightgreen)](./REMARK.md)
+
 Replication package for:
 
 Hamish W. Low (2005), *Self-Insurance in a Life-Cycle Model of Labour Supply and Savings*,
