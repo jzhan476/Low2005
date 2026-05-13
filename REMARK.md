@@ -93,17 +93,17 @@ each period, so retirement income is handled outside the HARK problem.
 
 ## Replication targets
 
-| Statistic (working life, baseline calibration)   | Low (2005) | This replication |
-|--------------------------------------------------|:----------:|:----------------:|
-| Mean hours, fraction of time worked              | 0.40       | 0.36             |
-| Peak-assets age (full life cycle)                | ~60        | 56               |
+| Statistic (working life, baseline calibration) | Low (2005) | This replication | Residual (this − target) |
+|------------------------------------------------|:----------:|:----------------:|:------------------------:|
+| Mean hours, fraction of time worked            | 0.40       | 0.36             | −0.04 (−10.0%)           |
+| Peak-assets age (full life cycle)              | ~60        | 56               | ≈ −4 yr (≈ −6.7%)        |
 
-Both targets are within ~10% of the published calibration. The slight
-underprediction of mean hours and the five-year-earlier peak are driven by
-ingredients of Low (2005) that are deliberately *not* added here: no mortality
-risk during retirement, no bequest motive, no separate unemployment-style
-transitory state. The qualitative comparisons (uncertainty raises early-life
-hours; flexible-hours households accumulate less precautionary wealth than
+Both absolute residuals are small. The slight underprediction of mean hours
+and the approximately four-year-earlier peak are driven by ingredients of
+Low (2005) that are deliberately *not* added here: no mortality risk during
+retirement, no bequest motive, no separate unemployment-style transitory
+state. The qualitative comparisons (uncertainty raises early-life hours;
+flexible-hours households accumulate less precautionary wealth than
 fixed-hours households at the common $\delta$) match the paper.
 
 ## Out of scope
