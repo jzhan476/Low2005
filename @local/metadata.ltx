@@ -75,7 +75,7 @@
 
 % PDF metadata (for hyperref \hypersetup)
 \newcommand{\PDFTitle}{\TitleFull}
-\newcommand{\PDFAuthor}{REMARK Replication Package}
+\newcommand{\PDFAuthor}{Jiaxuan Zhang}
 \newcommand{\PDFSubject}{Life-cycle labor supply, precautionary saving, incomplete markets (Low 2005)}
 \newcommand{\PDFKeywords}{precautionary saving, life-cycle labor supply, incomplete markets, self-insurance, heterogeneous agents}
 
@@ -104,34 +104,19 @@ This REMARK revisits Low's life-cycle model of labor supply and savings in an in
   \fi
 
   \begin{aug}
-    \author[jhu-econ]{\fnms{Christopher D.}~\snm{Carroll}\ead[label=e1]{ccarroll@jhu.edu}}
-    \author[fed]{\fnms{Edmund}~\snm{Crawley}\ead[label=e2]{edmund.s.crawley@frb.gov}}
-    \author[jhu-econ]{\fnms{William}~\snm{Du}\ead[label=e3]{wdu9@jhu.edu}}
-    \author[bundesbank]{\fnms{Ivan}~\snm{Frankovic}\ead[label=e4]{ivan.frankovic@bundesbank.de}}
-    \author[ssb-hofimar]{\fnms{H{\aa}kon}~\snm{Tretvoll}\ead[label=e5]{Hakon.Tretvoll@ssb.no}}
+    % Author of this REMARK replication (see CITATION.cff).
+    % TODO: replace the placeholder \orgname below with the actual affiliation.
+    \author[author-aff]{\fnms{Jiaxuan}~\snm{Zhang}}
 
-    \address[jhu-econ]{%
-      \orgdiv{Department of Economics},
+    \address[author-aff]{%
       \orgname{Johns Hopkins University}}
-
-    \address[fed]{%
-      \orgname{Federal Reserve Board}}
-
-    \address[bundesbank]{%
-      \orgname{Deutsche Bundesbank}}
-
-    \address[ssb-hofimar]{%
-      \orgname{Statistics Norway and HOFIMAR at BI Norwegian Business School}}
   \end{aug}
 
   % Funding/support information
   \begin{funding}
-    The views expressed in this paper are those of the authors and do not necessarily
-    represent those of the Federal Reserve Board, the Deutsche Bundesbank and the
-    Eurosystem, or Statistics Norway. This project has received funding from the
-    European Research Council (ERC) under the European Union's Horizon 2020 research
-    and innovation programme (grant agreement No.\ 851891) and from the Research
-    Council of Norway (grant No.\ 326419).
+    This REMARK is a replication of \citet{Low2005} prepared for the
+    \href{https://github.com/econ-ark/REMARK}{Econ-ARK REMARK} project.
+    The author declares no specific funding for this replication.
   \end{funding}
 
   % Abstract (using pre-loaded macro to avoid \input inside nested environments)
@@ -139,21 +124,21 @@ This REMARK revisits Low's life-cycle model of labor supply and savings in an in
     \AbstractText
   \end{abstract}
 
-  % Keywords (3-8 recommended by QE)
+  % Keywords (3-8 recommended by QE) -- aligned with REMARK.md / CITATION.cff for Low (2005)
   \begin{keyword}
-    \kwd{fiscal policy}
-    \kwd{unemployment insurance extensions}
-    \kwd{payroll tax cuts}
-    \kwd{HANK/heterogeneous agent models}
-    \kwd{marginal propensity to consume}
-    \kwd{spending multipliers}
+    \kwd{self-insurance}
+    \kwd{life-cycle labor supply}
+    \kwd{precautionary saving}
+    \kwd{incomplete markets}
+    \kwd{heterogeneous agents}
   \end{keyword}
 
   % JEL Classification (alphabetical order, up to 3 recommended by QE)
+  % Matches \jelclass{D91; H31} in Low2005.tex, plus J22 (time allocation/labor supply)
   \begin{keyword}[class=JEL]
-    \kwd{E21}
-    \kwd{E62}
+    \kwd{D91}
     \kwd{H31}
+    \kwd{J22}
   \end{keyword}
 }
 
