@@ -244,16 +244,15 @@ values reported by Low~(2005) for the baseline calibration
 \begin{table}[htbp]
   \centering
   \caption{Replication of Low (2005) baseline calibration targets
-  (uncertainty + flexible hours). The residual column reports
-  ``this replication $-$ Low (2005) target'' in absolute units and,
-  in parentheses, as a percentage of the Low~(2005) target.}
+  (uncertainty + flexible hours). Side-by-side values from the paper and
+  from \path{Code/Python/Low2005.py}.}
   \label{tab:replication-targets}
-  \begin{tabular}{lccc}
+  \begin{tabular}{lcc}
     \toprule
-    Statistic (working-life cross-section) & Low (2005) & This replication & Residual \\
+    Statistic (working-life cross-section) & Low (2005) & This replication \\
     \midrule
-    Mean hours, fraction of time worked & 0.40 & 0.36 & $-0.04$ ($-10.0\%$) \\
-    Peak-assets age (full life cycle) & $\sim$60 & 56 & $\approx-4$ yr ($\approx-6.7\%$) \\
+    Mean hours, fraction of time worked & 0.40 & 0.36 \\
+    Peak-assets age (full life cycle) & $\sim$60 & 56 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -270,13 +269,10 @@ flexible- and fixed-hours comparisons so that the gap in asset profiles
 isolates labour flexibility rather than a second pass of discount-rate
 fitting.
 
-The replication matches the qualitative content of Low~(2005), Table~1:
-both targets fall within an absolute residual of $-0.04$ (mean hours) and
-$\approx-4$ years (peak-assets age) of the published calibration, with the
-slight underprediction of mean hours and the approximately four-year-earlier
-peak driven by ingredients of Low~(2005) that are deliberately \emph{not}
-added here (no mortality risk during retirement, no bequest motive, no
-unemployment-style transitory state). On the
+The replication is aligned qualitatively with Low~(2005), Table~1. Any
+difference in the two headline numerical targets arises from deliberate
+limitations of this reproduction (no mortality risk during retirement,
+no bequest motive, no unemployment-style transitory state). On the
 qualitative comparisons the script examines (see
 Section~\ref{sec:replication_figures}), the replication agrees with Low~(2005)
 that uncertainty raises hours early in life and that flexible-hours
