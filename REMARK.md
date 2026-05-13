@@ -131,7 +131,12 @@ $$\mathrm{Frisch} \;=\; \frac{1-h}{h}\cdot\frac{1+\eta(\gamma-1)}{\gamma}
 This is above standard cross-sectional micro estimates (Chetty 2012
 preferred Frisch ≈ 0.5) and broadly consistent with lifecycle-corrected
 estimates (Domeij & Florén 2006; Imai & Keane 2004), as discussed in
-Section 3 of `Low2005.pdf`.
+Section 3 of `Low2005.pdf`. Holding the same targeted hours share
+$h = 0.40$, the closed-form Frisch formula there implies Frisch ≈ **0.93**
+at $\eta = 0.3$, **1.01** at $\eta = 0.4$ (baseline), and **1.09** at
+$\eta = 0.5$ (PDF Table "Sensitivity … to $\eta$"; full counterfactuals
+would re-calibrate hours).
+
 
 ## Out of scope
 

@@ -214,6 +214,26 @@ is therefore consistent with the macro-style elasticity that the
 flexible-hours channel needs to do meaningful precautionary work in a
 quantitative life-cycle model.
 
+\begin{table}[htbp]
+  \centering
+  \caption{Sensitivity of the structural Frisch elasticity
+  (equation~\eqref{eq:frisch}) to the consumption share $\eta$ at Low's
+  published hours target $h = 0.40$ and baseline $\gamma = 2.2$.  This
+  compares ``apples to apples'' holding the \emph{same} hours share;
+  in a full counterfactual each $\eta$ would shift simulated hours and
+  require re-calibration.}
+  \label{tab:frisch-eta}
+  \begin{tabular}{lc}
+    \toprule
+    Consumption share $\eta$ & Frisch (at $h = 0.40$, $\gamma = 2.2$) \\
+    \midrule
+    0.3 & $\approx 0.93$ \\
+    0.4 & $\approx 1.01$ \quad (baseline Low) \\
+    0.5 & $\approx 1.09$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
 \section{Replication targets}\label{sec:replication-targets}
 
 Table~\ref{tab:replication-targets} compares the two working-life summary
@@ -237,6 +257,18 @@ values reported by Low~(2005) for the baseline calibration
     \bottomrule
   \end{tabular}
 \end{table}
+
+In Low~(2005), Table~1, each row reports a calibrated discount factor
+chosen so that the model matches the PSID median $\mathrm{A}/y$
+of~$1.84$ for that specification; in Low's notation the flexible-hours
+uncertain-wage calibration has $\delta = 0.032$ versus $\delta =
+0.028$ for fixed hours, pairing a modestly higher implied discount rate
+(lower $\beta$) with labour flexibility precisely because adjustable
+hours absorb part of wage risk directly (cf.\ Section~\ref{sec:flex-vs-fixed}).
+This replication retains a \emph{single} headline $\delta = 0.032$ across the
+flexible- and fixed-hours comparisons so that the gap in asset profiles
+isolates labour flexibility rather than a second pass of discount-rate
+fitting.
 
 The replication matches the qualitative content of Low~(2005), Table~1:
 both targets fall within an absolute residual of $-0.04$ (mean hours) and
