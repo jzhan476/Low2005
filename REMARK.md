@@ -136,6 +136,19 @@ at $\eta = 0.3$, **1.01** at $\eta = 0.4$ (baseline), and **1.09** at
 $\eta = 0.5$ (PDF Table "Sensitivity … to $\eta$"; full counterfactuals
 would re-calibrate hours).
 
+### Additional simulated moments (flexible + uncertainty)
+
+After the five figures, `Code/Python/Low2005.py` prints a second block of
+**model-generated** statistics (not Low targets): median $a/y$ in the
+working-life panel, Gini of $a/y$ at age 64, pooled
+$\mathrm{Corr}(h, a/y)$, the fraction of simulated cells with very low
+$a/y$, the volatility of $\Delta\log$ of the cohort-mean consumption
+profile (with and without wage risk), discounted lifetime utility under
+Low's $u(c,z)$, and a **consumption-equivalent** scalar $\lambda$ solving
+$\mathbb{E}\sum \beta^t u((1+\lambda)c^{\mathrm{uncert}}, z^{\mathrm{uncert}})
+= \mathbb{E}\sum \beta^t u(c^{\mathrm{cert}}, z^{\mathrm{cert}})$ (consumption
+scaled on the risky path only).  Representative values from a typical
+run are tabulated in `Low2005.pdf` (Table "Additional simulated moments").
 
 ## Out of scope
 

@@ -85,6 +85,10 @@ After activation you can run the standard reproduction commands:
 After `./reproduce.sh --comp min`, the main expected outputs are:
 
 - PNG figures under `Figures/`
+- A printed summary to the terminal: headline replication targets plus
+  additional moments (wealth Gini, hours--assets correlation,
+  consumption-growth volatility, discounted utility, and a
+  consumption-equivalent measure of wage risk).
 
 After `./reproduce.sh --docs main`, the main expected output is:
 

@@ -37,8 +37,45 @@ from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.optimize import brentq
 from HARK.ConsumptionSaving.ConsLaborModel import LaborIntMargConsumerType
 from HARK.ConsumptionSaving.ConsIndShockModel import IndShockConsumerType
+
+
+def _gini(x):
+    """Gini coefficient for a 1-D array (cross-section)."""
+    x = np.asarray(x, dtype=float)
+    x = x[np.isfinite(x)]
+    if x.size == 0:
+        return float("nan")
+    s = np.sum(x)
+    if s <= 0.0:
+        return float("nan")
+    x = np.sort(x)
+    n = x.size
+    idx = np.arange(1, n + 1, dtype=float)
+    return float(np.sum((2.0 * idx - n - 1.0) * x) / (n * s))
+
+
+def _period_utility_low(c, L, *, gamma, eta):
+    """Low (2005) Cobb--Douglas CRRA: u = (c^eta * z^(1-eta))^(1-gamma)/(1-gamma), z=1-L."""
+    z = np.clip(1.0 - L, 1e-12, 1.0)
+    c = np.clip(c, 1e-12, None)
+    comp = (c ** eta) * (z ** (1.0 - eta))
+    if abs(1.0 - gamma) < 1e-10:
+        return np.log(comp)
+    return (comp ** (1.0 - gamma)) / (1.0 - gamma)
+
+
+def _mean_discounted_utility_labor_hist(history, *, T_work, beta, gamma, eta,
+                                        c_scale=1.0):
+    """Mean across agents of sum_{t=0}^{T-1} beta^t u(c_t, L_t) (working life only)."""
+    c = history["cNrm"][:T_work] * history["pLvl"][:T_work] * float(c_scale)
+    L = history["Lbr"][:T_work]
+    u = _period_utility_low(c, L, gamma=gamma, eta=eta)
+    t = np.arange(T_work, dtype=float)[:, None]
+    w = beta ** t
+    return float(np.mean(np.sum(w * u, axis=0)))
 
 # Resolve the Figures directory robustly so the script works whether it is
 # invoked from `Code/Python/` (the wrapper's CWD) or as a notebook from
@@ -544,12 +581,69 @@ print(f"Saved: {FIG_DIR / 'flexible_vs_fixed.png'}")
 # %% [markdown]
 # ## Summary Statistics
 #
-# Comparison with Low (2005) Table 1 calibration targets:
-# - Mean hours share (working age): ~0.40
-# - Median assets/income ratio (working age): 1.84
-# - Aggregate assets/income ratio (working age): 2.14
+# Headline targets from Low (2005) Table~1 (mean hours, peak-asset age) plus
+# additional simulated moments: wealth dispersion (Gini), life-cycle
+# consumption volatility, pooled hours--assets correlation, liquidity
+# incidence, and a consumption-equivalent compensation for wage
+# uncertainty (flexible hours only).
 
 # %%
+# --- Additional moments (flexible + uncertainty, working life unless noted)
+aNrm_u = agent.history["aNrm"]
+L_u = agent.history["Lbr"]
+c_lvl_u = agent.history["cNrm"] * agent.history["pLvl"]
+mean_c_u = np.mean(c_lvl_u, axis=1)
+dlogc = np.diff(np.log(np.clip(mean_c_u, 1e-12, None)))
+vol_dlogc_u = float(np.std(dlogc))
+
+median_Ay_u = float(np.median(aNrm_u))
+gini_a_last = _gini(aNrm_u[-1])
+flat_L = L_u.reshape(-1)
+flat_a = aNrm_u.reshape(-1)
+corr_La = float(np.corrcoef(flat_L, flat_a)[0, 1])
+frac_low_a = float(np.mean(aNrm_u < 0.05))
+
+# Lifetime utility (Low preferences) and CEV of uncertainty vs certainty
+V_u = _mean_discounted_utility_labor_hist(
+    agent.history, T_work=T_work, beta=DiscFac, gamma=gamma_low, eta=eta_low,
+)
+V_c = _mean_discounted_utility_labor_hist(
+    cert_agent.history, T_work=T_work, beta=DiscFac, gamma=gamma_low, eta=eta_low,
+)
+
+
+def _cev_residual(lam):
+    return (
+        _mean_discounted_utility_labor_hist(
+            agent.history, T_work=T_work, beta=DiscFac,
+            gamma=gamma_low, eta=eta_low, c_scale=1.0 + lam,
+        )
+        - V_c
+    )
+
+
+try:
+    lam_cev = brentq(_cev_residual, -0.95, 5.0, xtol=1e-5, rtol=1e-5)
+except ValueError:
+    lam_cev = float("nan")
+
+vol_dlogc_c = float(
+    np.std(
+        np.diff(
+            np.log(
+                np.clip(
+                    np.mean(
+                        cert_agent.history["cNrm"] * cert_agent.history["pLvl"],
+                        axis=1,
+                    ),
+                    1e-12,
+                    None,
+                )
+            )
+        )
+    )
+)
+
 print("\n" + "=" * 60)
 print("Summary: Replication vs Low (2005) Targets")
 print("=" * 60)
@@ -562,6 +656,20 @@ print(f"{'Peak assets age (full life cycle)':<40} "
 print(f"{'Mean consumption (working)':<40} "
       f"{np.mean(flex_u_c_work):.4f}     {'--':>5}")
 print("=" * 60)
+print("\nAdditional simulated moments (flexible + uncertainty, working life):")
+print(f"  Median assets / permanent income (aNrm)     {median_Ay_u:>10.4f}")
+print(f"  Gini of aNrm at last working age (64)       {gini_a_last:>10.4f}")
+print(f"  Corr(Labor, aNrm), pooled over ages×agents {corr_La:>+10.4f}")
+print(f"  Fraction (age×agent) with aNrm < 0.05       {frac_low_a:>10.4f}")
+print(f"  Std of Δlog mean consumption (by age)      {vol_dlogc_u:>10.4f}")
+print(f"    (same, certainty case)                   {vol_dlogc_c:>10.4f}")
+print("\nLifetime utility (discounted, Low u), mean across agents:")
+print(f"  Uncertainty   V = {V_u:>12.4f}")
+print(f"  Certainty     V = {V_c:>12.4f}")
+print(f"  Difference V_uncert − V_cert                {V_u - V_c:>+10.4f}")
+print("\nConsumption-equivalent value of removing wage risk (flexible hours):")
+print("  λ such that E[Σ β^t u((1+λ)c_t^uncert, L_t^uncert)] = E[Σ β^t u(c_t^cert, L_t^cert)]")
+print(f"  ⇒ λ ≈ {lam_cev:+.4f}  (permanent scaling of consumption in risky economy)")
 print("\nKey qualitative results:")
 print(f"  Uncertainty raises hours early in life: "
       f"{flex_u_L_work[0]:.3f} (uncert) vs {flex_c_L_work[0]:.3f} (cert)")

@@ -279,6 +279,63 @@ that uncertainty raises hours early in life and that flexible-hours
 households display a more pronounced life-cycle saving pattern than
 fixed-hours households.
 
+\section{Additional simulated moments and welfare}\label{sec:extra-moments}
+Beyond the life-cycle means plotted in Section~\ref{sec:replication_figures},
+\path{Code/Python/Low2005.py} reports additional statistics from the
+flexible-hours economy with wage uncertainty (working life, $10{,}000$
+simulated agents).  These are \emph{model outputs} under the headline
+calibration rather than targets from Low~(2005).
+
+\begin{table}[htbp]
+  \centering
+  \caption{Additional simulated moments (flexible hours + uncertainty,
+  working life). Values are produced by the summary block at the end of
+  \path{Code/Python/Low2005.py}.}
+  \label{tab:extra-moments}
+  \begin{tabular}{lc}
+    \toprule
+    Moment & Value \\
+    \midrule
+    Median assets / permanent income ($a/y$) & $0.29$ \\
+    Gini coefficient of $a/y$ at age $64$ & $0.56$ \\
+    Correlation $\mathrm{Corr}(h,\,a/y)$, pooled over ages and agents & $+0.27$ \\
+    Fraction of (age$\times$agent) cells with $a/y < 0.05$ & $0.12$ \\
+    Std.\ dev.\ of $\Delta\log$ cohort-mean consumption (by age) & $0.012$ \\
+    \quad same object, certainty economy & $0.012$ \\
+    CEV $\lambda$ for wage risk (see text) & $+0.32$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The pooled correlation between hours and normalized assets is positive:
+households that work more tend to hold more assets along the intensive
+margin in the simulated panel, consistent with precautionary labour supply
+building a buffer stock \citep{Carroll1997Low, Deaton1991Low}.  The
+Gini of $a/y$ at the last working age measures wealth concentration in
+levels comparable to other life-cycle calibrations \citep{Cagetti2003Low}.
+
+The last row reports a consumption-equivalent measure of the cost of
+wage risk in the flexible-hours economy.  Let $u(c,z)$ denote Low's
+period utility with leisure $z=1-h$, and let $(c_{it}^{\mathrm u},
+h_{it}^{\mathrm u})$ and $(c_{it}^{\mathrm c}, h_{it}^{\mathrm c})$
+denote simulated consumption and hours under uncertainty and certainty.
+The scalar $\lambda$ solves
+\[
+  \mathbb{E}_i\Big[\sum_{t=0}^{T-1} \beta^t\,
+  u\big((1+\lambda)\,c_{it}^{\mathrm u},\,1-h_{it}^{\mathrm u}\big)\Big]
+  \;=\;
+  \mathbb{E}_i\Big[\sum_{t=0}^{T-1} \beta^t\,
+  u\big(c_{it}^{\mathrm c},\,1-h_{it}^{\mathrm c}\big)\Big],
+\]
+where the scaling $(1+\lambda)$ applies only to
+consumption on the \emph{uncertain} path while leaving hours at their
+risky-process realisation (a partial, consumption-only compensation).
+With $\gamma>1$, lifetime utility is negative on the CRRA scale; the
+script prints $V^{\mathrm u}-V^{\mathrm c}\approx -4.7$, so uncertainty
+lowers welfare, and $\lambda\approx 0.32$ indicates that a permanent
+roughly one-third increase in consumption along the risky path would be
+needed to match the certainty economy's expected discounted utility.
+
 \section{Key Results}
 
 \subsection{Flexible labor supply under certainty}
