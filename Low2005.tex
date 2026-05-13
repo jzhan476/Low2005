@@ -182,6 +182,38 @@ economies, respectively. Retirement (ages~65--84) is
 appended as a closed-form deterministic forward extension for plotting only; see
 Section~\ref{sec:replication_figures} below.
 
+\subsection{Implied Frisch elasticity}\label{sec:frisch}
+The Cobb--Douglas-in-CRRA preferences in Low~(2005) deliver a closed
+form for the Frisch elasticity of labor supply, which is useful both as
+an internal consistency check on the calibration and as a way to
+locate the model in the empirical labor-supply literature. Holding the
+marginal utility of consumption~$u_c$ constant and totally
+differentiating the intratemporal first-order condition
+$u_z/u_c = w$ for $u(c,z) = (c^{\eta}\,z^{1-\eta})^{1-\gamma}/(1-\gamma)$
+gives
+\begin{equation}\label{eq:frisch}
+  \mathrm{Frisch}\ \equiv\ \left.\frac{\partial \log h}{\partial \log w}\right|_{u_c}
+  \;=\; \frac{1-h}{h}\cdot\frac{1+\eta(\gamma-1)}{\gamma},
+\end{equation}
+where $h = 1-z$ is the labor share. At the calibration target
+$h = 0.40$ with $\eta = 0.4$ and $\gamma = 2.2$ this yields
+$\mathrm{Frisch}\approx 1.0$.\footnote{Algebraically:
+$(1-h)/h = 1.5$ and $[1+\eta(\gamma-1)]/\gamma = 1.48/2.2 \approx 0.673$,
+so $\mathrm{Frisch} \approx 1.5\times 0.673 \approx 1.01$.}
+This sits above standard cross-sectional micro estimates---\citet{Chetty2012Low}
+reports a preferred Hicksian intensive-margin elasticity of
+$\sim 0.33$ and a Frisch upper bound of $\sim 0.5$ from a meta-analysis
+of micro studies---but is comparable to the lifecycle-MaCurdy
+estimates that explicitly correct for borrowing constraints in
+\citet{DomeijFloden2006Low} (whose adjustment roughly doubles the
+naive Frisch in calibrated economies similar to Low's) and to the
+indirect-inference estimates of \citet{ImaiKeane2004Low}, which place
+the lifecycle Frisch above unity once human-capital accumulation is
+modeled. The position of Low's calibration in the upper micro range
+is therefore consistent with the macro-style elasticity that the
+flexible-hours channel needs to do meaningful precautionary work in a
+quantitative life-cycle model.
+
 \section{Replication targets}\label{sec:replication-targets}
 
 Table~\ref{tab:replication-targets} compares the two working-life summary
@@ -254,6 +286,29 @@ than the flexible-hours economy at the common~$\delta$. Figure
 substantially higher under fixed hours, consistent with Low~(2005)'s
 finding that flexible hours act as a partial substitute for asset-based
 self-insurance.
+
+Quantitatively, the HARK simulation prints a peak of mean assets of
+$1.45$ for the flexible-hours economy and $2.85$ for the fixed-hours
+economy at the common discount rate, a roughly twofold gap. The same
+flexibility effect is identified \emph{across} households in the
+heterogeneous-agent literature: \citet{PijoanMas2006Low} shows that
+endogenous labor supply lowers the welfare cost of idiosyncratic risk by
+absorbing a sizeable share of income shocks at the intensive margin, and
+\citet{HeathcoteStoreslettenViolante2010Low} document a similar
+flexibility effect in a richer environment with permanent and
+transitory wage components close to those of \citet{MeghirPistaferri2004Low}
+used here. \citet{ErosaFusterKambourov2016Low} go further by showing
+that aggregate elasticities consistent with this micro hours response
+require the very life-cycle composition of households that Low's
+calibration targets. The twofold gap between flexible- and fixed-hours
+peak assets in this replication is therefore a clean quantitative
+reading of a now-standard mechanism: hours act as a state-contingent
+transfer that economizes on buffer-stock saving in the sense of
+\citet{Carroll1997Low} and \citet{CarrollSamwick1997Low}. The role of
+\emph{uncertainty} per se is comparably striking: at the same calibration
+the certainty version of the flexible-hours economy peaks at only
+$0.16$, so the precautionary motive alone roughly accounts for a
+ninefold increase in working-life peak wealth.
 
 \subsection{Alternative preferences}
 The paper also checks robustness to alternative preferences. The qualitative message is

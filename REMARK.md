@@ -93,6 +93,9 @@ each period, so retirement income is handled outside the HARK problem.
 
 ## Replication targets
 
+The two quantitative targets that Low (2005) Table 1 calibrates the
+flexible-hours uncertainty economy to match:
+
 | Statistic (working life, baseline calibration) | Low (2005) | This replication | Residual (this − target) |
 |------------------------------------------------|:----------:|:----------------:|:------------------------:|
 | Mean hours, fraction of time worked            | 0.40       | 0.36             | −0.04 (−10.0%)           |
@@ -102,9 +105,33 @@ Both absolute residuals are small. The slight underprediction of mean hours
 and the approximately four-year-earlier peak are driven by ingredients of
 Low (2005) that are deliberately *not* added here: no mortality risk during
 retirement, no bequest motive, no separate unemployment-style transitory
-state. The qualitative comparisons (uncertainty raises early-life hours;
-flexible-hours households accumulate less precautionary wealth than
-fixed-hours households at the common $\delta$) match the paper.
+state.
+
+### Qualitative comparisons (Low 2005, Figs. 3–7)
+
+Each row reports the model output that the replication script prints; the
+sign and order-of-magnitude pattern matches Low (2005).
+
+| Mechanism (Low 2005 figure)                                   | Replication output (peak / early-life)        | Sign matches |
+|---------------------------------------------------------------|-----------------------------------------------|:------------:|
+| Uncertainty raises early-life hours (Fig. 3)                  | 0.437 (uncert) vs 0.405 (cert), age 25        | ✓            |
+| Uncertainty raises peak asset accumulation (Fig. 5)           | 1.45 (uncert) vs 0.16 (cert) — ≈ 9× increase  | ✓            |
+| Flexible hours reduce precautionary saving (Fig. 6)           | 1.45 (flex) vs 2.85 (fixed) — ≈ 2× ratio      | ✓            |
+| Hump-shaped life-cycle consumption (Fig. 4)                   | Yes; peak around mid-50s                      | ✓            |
+| Asset profile peaks before retirement (Fig. 7)                | Peak at age 56 (Low: ~60)                     | ✓            |
+
+### Implied Frisch elasticity
+
+The Cobb–Douglas-in-CRRA utility delivers a closed-form Frisch labor
+supply elasticity at the calibration point of
+
+$$\mathrm{Frisch} \;=\; \frac{1-h}{h}\cdot\frac{1+\eta(\gamma-1)}{\gamma}
+\;\approx\; 1.0 \quad\text{at}\ h=0.40,\ \eta=0.4,\ \gamma=2.2.$$
+
+This is above standard cross-sectional micro estimates (Chetty 2012
+preferred Frisch ≈ 0.5) and broadly consistent with lifecycle-corrected
+estimates (Domeij & Florén 2006; Imai & Keane 2004), as discussed in
+Section 3 of `Low2005.pdf`.
 
 ## Out of scope
 
