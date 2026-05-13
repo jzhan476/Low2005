@@ -109,6 +109,55 @@ and consume less early in life. With flexible labor supply, they borrow more whe
 accumulate more assets in middle age, and generate hours and consumption profiles that are
 closer to the empirical life-cycle patterns discussed in the paper.
 
+\section{Related literature}\label{sec:related-literature}
+
+Low (2005) sits at the intersection of three literatures, and the cleanest way
+to understand its contribution is to place it relative to each of them.
+
+\paragraph{Incomplete-markets foundations and precautionary saving.}
+The household problem is a Bewley-style economy with uninsurable idiosyncratic
+risk in the tradition of \citet{Huggett1993Low} and \citet{Aiyagari1994Low}.
+The precautionary-savings mechanism that drives household behavior in such
+models was formalized by \citet{Kimball1990Low}, who characterized prudence
+and the resulting demand for buffer wealth in both small and large risks.
+\citet{Carroll1997Low} sharpened this into the buffer-stock interpretation of
+life-cycle consumption that is now standard, and \citet{CarrollSamwick1997Low}
+documented empirically that households facing higher income variance hold
+significantly more wealth. Within this tradition, the strand most directly
+parallel to Low (2005) is \citet{Cagetti2003Low}, who likewise estimates a
+life-cycle precautionary-saving model but holds hours fixed, and
+\citet{GourinchasParker2002Low}, who jointly estimate the buffer-stock and
+life-cycle motives over the working life.
+
+\paragraph{Life-cycle labor supply with risk.}
+Low's distinctive contribution is to add a flexible labor-supply margin to
+this framework. The closest contemporaneous work is \citet{PijoanMas2006Low},
+who poses essentially the same question --- ``precautionary saving or working
+longer hours?'' --- and confirms that flexible hours partially substitute for
+asset-based self-insurance. \citet{ImaiKeane2004Low} embed life-cycle labor
+supply in a model with on-the-job human-capital accumulation and find that
+this dramatically raises implied intertemporal substitution. From a different
+angle, \citet{DomeijFloden2006Low} show that ignoring borrowing constraints
+biases standard estimates of the labor-supply elasticity downward, and
+\citet{ErosaFusterKambourov2016Low} provide a quantitative micro-founded
+theory of aggregate hours that emphasizes the interaction of intensive and
+extensive margins. Together, this work motivates --- and to a substantial
+extent vindicates --- the labor-supply margin that Low models.
+
+\paragraph{Empirical magnitudes and modern context.}
+The wage process in Low (2005) is parameterized using estimates from
+\citet{MeghirPistaferri2004Low}, and the broader empirical patterns of
+life-cycle wage inequality that the calibration aims to match are documented
+by \citet{HeathcoteStoreslettenViolante2010Low}. The Frisch elasticity that
+governs the labor-supply response to shocks remains contested; the synthesis
+in \citet{Chetty2012Low} reconciles much of the gap between micro and macro
+estimates by allowing for optimization frictions. More recent
+heterogeneous-agent New Keynesian work, such as \citet{KaplanMollViolante2018Low},
+inherits the incomplete-markets infrastructure but typically holds labor
+supply fixed; in this sense Low's labor-supply self-insurance margin remains
+an underexplored channel in the modern HANK literature, with related but
+fixed-hours analyses found in \citet{Deaton1991Low} and \citet{French2004Low}.
+
 \section{Model Setup}
 The model is a partial-equilibrium life-cycle problem in which households choose consumption,
 leisure, and savings subject to wage risk. Period utility takes the Cobb--Douglas CRRA form
@@ -167,9 +216,10 @@ The computational replication in this repository is implemented in
 \path{Code/Python/Low2005.py}.
 Following the paper, the code focuses on the working-life behavior that drives the main
 comparative statics: consumption, hours, and assets under certainty versus uncertainty and
-under flexible versus fixed labor supply. The simulation uses a fixed random seed and
-HARK's \texttt{LaborIntMargConsumerType} and \texttt{IndShockConsumerType} for the
-flexible-hours and fixed-hours economies, respectively. Retirement (ages~65--84) is
+under flexible versus fixed labor supply. The simulation uses a fixed random seed and the
+\texttt{LaborIntMargConsumerType} and \texttt{IndShockConsumerType} life-cycle solvers from
+the open-source HARK toolkit~\citep{EconARK-HARK} for the flexible-hours and fixed-hours
+economies, respectively. Retirement (ages~65--84) is
 appended as a closed-form deterministic forward extension for plotting only; see
 Section~\ref{sec:replication_figures} below.
 
