@@ -1,12 +1,41 @@
 ---
-remark-version: 1.0
+# ============================================================================
+# Metadata for indexing this REMARK in the econ-ark project.
+# Schema: https://github.com/econ-ark/REMARK (STANDARD.md, schema.json)
+# ============================================================================
+
+# REMARK identity
+remark-version: "1.0"
+remark-name: Low2005
 tier: 2
 github_repo_url: https://github.com/jzhan476/Low2005
-remark-name: Low2005
+
+# Authors of this replication software
+authors:
+  - family-names: Zhang
+    given-names: Jiaxuan
+
+# Original paper being replicated
+references:
+  - type: article
+    title: Self-Insurance in a Life-Cycle Model of Labour Supply and Savings
+    authors:
+      - family-names: Low
+        given-names: Hamish W.
+    journal: Review of Economic Dynamics
+    year: 2005
+    volume: 8
+    issue: 4
+    pages: 945-975
+    doi: 10.1016/j.red.2005.03.002
+
+# Notebooks shipped in this repo (paths relative to repo root)
 notebooks:
   - Code/Python/Low2005.ipynb
+
 tags:
   - REMARK
+  - Notebook
   - Reproduction
   - LifeCycle
   - LaborSupply
@@ -16,23 +45,138 @@ keywords:
   - Savings
   - Incomplete Markets
   - Life-Cycle
+  - Precautionary Saving
+  - Heterogeneous Agents
 ---
+
 # Low (2005): Self-Insurance in a Life-Cycle Model of Labour Supply and Savings
 
-This repository replicates:
+This is a Tier-2 REMARK reproducing the main quantitative comparisons of
+Low, Hamish W. (2005), *Self-Insurance in a Life-Cycle Model of Labour Supply
+and Savings*, **Review of Economic Dynamics**, 8(4), 945-975
+([DOI: 10.1016/j.red.2005.03.002](https://doi.org/10.1016/j.red.2005.03.002)).
+The replication is implemented in Python on top of [HARK](https://github.com/econ-ark/HARK).
 
-Low, Hamish W. (2005). *Self-Insurance in a Life-Cycle Model of Labour Supply and Savings*,
-**Review of Economic Dynamics**, 8(4), 945-975.
-DOI: <https://doi.org/10.1016/j.red.2005.03.002>
+## Authors
 
-## Version and citation
+- **Jiaxuan Zhang** — Johns Hopkins University, Econ 606 (Spring 2026).
+  GitHub: [@jzhan476](https://github.com/jzhan476).
 
-- Current git release: **v1.1.0** (see [GitHub Releases](https://github.com/jzhan476/Low2005/releases)).
-- To cite this replication **software**, use metadata in `CITATION.cff` (v1.1.0). The
-  underlying article remains Low (2005), *Review of Economic Dynamics*.
+## Abstract (Low 2005)
 
-## Replication status
+The paper studies how households self-insure over the life cycle when future
+wages are uncertain and asset markets are incomplete. The central mechanism is
+that *labor supply itself is an insurance margin*: with flexible hours,
+households respond to wage risk by adjusting consumption, assets, **and** work
+effort. Under uncertainty, households work more and consume less early in life;
+flexible hours generate stronger precautionary asset accumulation in middle age
+and life-cycle profiles for hours, consumption, and wealth that are closer to
+the empirical patterns the paper aims to explain.
 
-1. HARK life-cycle replication: `Code/Python/Low2005.py` / `Low2005.ipynb` (`LaborIntMargConsumerType`, `IndShockConsumerType`).
-2. Figures written to `Figures/`; build the PDF with `./reproduce.sh --docs main`.
-3. Environments: `pyproject.toml` / `uv.lock` with `requires-python = ">=3.9,<3.13"`; Binder bootstraps **Python 3.11** via `binder/environment.yml` + `binder/postBuild` (`uv sync --frozen`).
+## What is reproduced
+
+All quantitative results are reproduced from scratch in Python using
+`HARK.ConsumptionSaving`:
+
+| Paper object             | Implementation                                                      |
+|--------------------------|---------------------------------------------------------------------|
+| Flexible-hours economy   | `HARK.ConsumptionSaving.ConsLaborModel.LaborIntMargConsumerType`    |
+| Fixed-hours economy      | `HARK.ConsumptionSaving.ConsIndShockModel.IndShockConsumerType`     |
+| Calibration (Table 1)    | Encoded in `Code/Python/Low2005.py` (matches Low 2005, p. 956)      |
+| Figures 3-7              | Five PNGs written to `Figures/` (see "Expected outputs" below)      |
+| Working-life summary     | Mean hours and peak-asset age printed by `reproduce_min.sh`         |
+
+Working life (ages 25-64) is solved with HARK's life-cycle solvers; retirement
+(ages 65-84) is appended as a closed-form deterministic forward extension for
+plotting only — `LaborIntMargConsumerType` requires strictly positive wages
+each period, so retirement income is handled outside the HARK problem.
+
+## Replication targets
+
+| Statistic (working life, baseline calibration)   | Low (2005) | This replication |
+|--------------------------------------------------|:----------:|:----------------:|
+| Mean hours, fraction of time worked              | 0.40       | 0.36             |
+| Peak-assets age (full life cycle)                | ~60        | 56               |
+
+Both targets are within ~10% of the published calibration. The slight
+underprediction of mean hours and the five-year-earlier peak are driven by
+ingredients of Low (2005) that are deliberately *not* added here: no mortality
+risk during retirement, no bequest motive, no separate unemployment-style
+transitory state. The qualitative comparisons (uncertainty raises early-life
+hours; flexible-hours households accumulate less precautionary wealth than
+fixed-hours households at the common $\delta$) match the paper.
+
+## Out of scope
+
+- $\delta$ is **not** re-calibrated separately for the flexible- and fixed-hours
+  economies (Low's headline rate $\delta = 0.032$ is reused for both); the
+  replication targets the *shape* of the asset and consumption profiles.
+- Mortality risk in retirement, bequest motives, and unemployment shocks are
+  not modeled.
+- The CES-aggregator and additive-separability robustness exercises (Low 2005,
+  Section on alternative preferences) are discussed in the paper but not
+  re-run.
+
+## How to reproduce
+
+```bash
+git clone https://github.com/jzhan476/Low2005.git
+cd Low2005
+git checkout v1.1.0
+uv sync --frozen --no-dev      # or: conda env create -f binder/environment.yml
+./reproduce.sh --comp min      # computational replication only (~5-15 s)
+./reproduce.sh --docs main     # build Low2005.pdf only          (~8-15 s)
+./reproduce.sh --all           # full pipeline                    (<30 s)
+```
+
+Binder: `binder/environment.yml` (Python 3.11) plus `binder/postBuild`
+materializes pinned dependencies via `uv sync --frozen`. Local installs
+support Python 3.9-3.12 (`requires-python = ">=3.9,<3.13"` in `pyproject.toml`).
+
+## Expected outputs
+
+After `./reproduce.sh --comp min`, five PNGs are written to `Figures/`:
+
+| File                              | Mirrors Low (2005) figure                       |
+|-----------------------------------|-------------------------------------------------|
+| `lifecycle_profiles.png`          | Figure 7 — life-cycle hours/consumption/assets  |
+| `hours_cert_vs_uncert.png`        | Figure 3 — hours under certainty vs. uncertainty|
+| `consumption_cert_vs_uncert.png`  | Figure 4 — mean consumption                     |
+| `assets_cert_vs_uncert.png`       | Figure 5 — mean asset holdings                  |
+| `flexible_vs_fixed.png`           | Figure 6 — flex vs. fixed hours under risk      |
+
+`./reproduce.sh --docs main` then produces `Low2005.pdf`.
+
+## Computational requirements
+
+- Python 3.9-3.12 (tested on 3.11).
+- No GPU, no compiled extensions beyond what HARK and SciPy ship with.
+- Wall-clock on a recent Apple-silicon laptop with a warm `uv` environment:
+  comp ~5-10 s, docs ~5-10 s, all <30 s.
+- LaTeX (`latexmk`, `pdflatex`, `bibtex`) is required only for the docs step.
+
+## Tier-2 compliance checklist
+
+- [x] Tagged release **v1.1.0** on `main` plus a GitHub Release
+- [x] `reproduce.sh` (full) and `reproduce_min.sh` (fast)
+- [x] Root `Dockerfile`
+- [x] `LICENSE` (Apache-2.0)
+- [x] `binder/environment.yml` + `binder/postBuild`, pinned via `uv.lock`
+- [x] `README.md` >= 100 non-empty lines
+- [x] `REMARK.md` with `tier: 2` frontmatter and notebook list (this file)
+- [x] Valid `CITATION.cff` (CFF 1.2.0)
+
+## How to cite
+
+To cite this **replication software**, use the metadata in
+[`CITATION.cff`](./CITATION.cff) (currently v1.1.0). The underlying article
+remains:
+
+> Low, Hamish W. (2005). Self-Insurance in a Life-Cycle Model of Labour Supply
+> and Savings. *Review of Economic Dynamics*, 8(4), 945-975.
+> [DOI: 10.1016/j.red.2005.03.002](https://doi.org/10.1016/j.red.2005.03.002).
+
+## License & contact
+
+Apache-2.0 (see [`LICENSE`](./LICENSE)). Issues and pull requests welcome at
+[github.com/jzhan476/Low2005/issues](https://github.com/jzhan476/Low2005/issues).
